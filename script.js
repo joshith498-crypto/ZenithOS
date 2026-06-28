@@ -1,437 +1,389 @@
-// Global System Clock Engine Selectors
-const liveClock = document.getElementById('live-clock');
+document.addEventListener("DOMContentLoaded", () => {
 
-// App Selectors: Terminal Window Modules
-const terminalInput = document.getElementById('terminal-input');
-const terminalBody = document.querySelector('.terminal-body');
-const mainTerminal = document.getElementById('main-terminal');
-const closeTerminalBtn = document.getElementById('close-terminal-btn');
-const minTerminalBtn = document.getElementById('min-terminal-btn');
-const maxTerminalBtn = document.getElementById('max-terminal-btn');
-const terminalShortcut = document.getElementById('terminal-shortcut');
-const tabTerminal = document.getElementById('tab-terminal');
+    const initialBg = document.getElementById('desktop-bg');
+    if (initialBg) initialBg.classList.add('bg-space');
 
-// App Selectors: Satellite Maps Window Modules
-const videoWindow = document.getElementById('video-window');
-const closeVideoBtn = document.getElementById('close-video-btn');
-const minVideoBtn = document.getElementById('min-video-btn');
-const maxVideoBtn = document.getElementById('max-video-btn');
-const videoShortcut = document.getElementById('video-shortcut');
-const tabVideo = document.getElementById('tab-video');
+    let activelyDraggedElementId = null;
+    let isDraggingFromDock = false;
 
-// App Selectors: Alien Blaster Window Modules
-const gameWindow = document.getElementById('game-window');
-const closeGameBtn = document.getElementById('close-game-btn');
-const minGameBtn = document.getElementById('min-game-btn');
-const maxGameBtn = document.getElementById('max-game-btn');
-const gameShortcut = document.getElementById('game-shortcut');
-const tabGame = document.getElementById('tab-game');
-const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
+    /* --- VIRTUAL DIRECTORY OS FILE SYSTEM REGISTRY --- */
+    const virtualFileSystem = {
+        desktop: [
+            { name: "📁 Finder.app Link", desc: "Core application pointer map to system paths." },
+            { name: "📁 Terminal.app Link", desc: "Command Line Pipeline to local runtime environment." },
+            { name: "📁 Arcade.app Link", desc: "Interactive game subroutines terminal container." },
+            { name: "📁 Settings.app Link", desc: "Global layout and perimeter defense configurations." }
+        ],
+        documents: [
+            { name: "📄 satellite_uplink.cfg", desc: "TARGET_IP=128.0.0.1\nPORT=9100\nENCRYPTION=AES_256_GCM\nSTATUS=TUNNEL_ESTABLISHED" },
+            { name: "📄 classified_blueprint.dat", desc: "DEEP_SPACE_OBJECT_ID: #498-CRYPTO\nOrbit: Mars Geo-Synchronous Grid\nPayload: Atmospheric Spectrometer" },
+            { name: "📄 warp_drive_core.log", desc: "Antimatter containment field operating at 98.4% cohesion accuracy." }
+        ],
+        downloads: [
+            { name: "📦 CSP_v3.0_Mod.zip", desc: "Assetto Corsa Custom Shaders Patch file container package." },
+            { name: "🎵 Space_Ambience_Retro.mp3", desc: "Looped ambient workspace theme audio file metadata stream." }
+        ],
+        system: [
+            { name: "⚙️ kernel_omni.sys", desc: "NASA Core Engine Subsystem Kernel running on architecture pipelines." },
+            { name: "⚙️ hardware_allocator.dll", desc: "Memory assignment parameters for local workstation matrix hardware mapping." }
+        ],
+        trash: [
+            { name: "🗑️ broken_telemetry_node.bak", desc: "Corrupted coordinate log. Discarded June 2026." }
+        ]
+    };
 
-// App Selectors: Guess Game Cryptor Window Modules
-const guessWindow = document.getElementById('guess-window');
-const closeGuessBtn = document.getElementById('close-guess-btn');
-const minGuessBtn = document.getElementById('min-guess-btn');
-const maxGuessBtn = document.getElementById('max-guess-btn');
-const guessShortcut = document.getElementById('guess-shortcut');
-const tabGuess = document.getElementById('tab-guess');
-const guessInput = document.getElementById('guess-input');
-const guessBtn = document.getElementById('guess-btn');
-const guessAttempts = document.getElementById('guess-attempts');
-const guessHint = document.getElementById('guess-hint');
-const guessResetBtn = document.getElementById('guess-reset-btn');
+    /* --- SYSTEM NOTIFICATION BANNER ENGINE --- */
+    function triggerOSPopup(title, message, icon = "🛰️") {
+        const popup = document.getElementById('system-popup');
+        const pText = document.getElementById('popup-text');
+        if (!popup || !pText) return;
 
-// --- 1. RUN LIVE SYSTEM CLOCK ---
-function updateClock() {
-    const now = new Date();
-    let hours = now.getHours();
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    const seconds = String(now.getSeconds()).padStart(2, '0');
-    const ampm = hours >= 12 ? 'PM' : 'AM';
-    
-    hours = hours % 12;
-    hours = hours ? hours : 12;
-    const formattedHours = String(hours).padStart(2, '0');
-    liveClock.innerText = `${formattedHours}:${minutes}:${seconds} ${ampm}`;
-}
-setInterval(updateClock, 1000);
-updateClock();
+        const pTitle = popup.querySelector('.notif-title');
+        const pIcon = popup.querySelector('.notif-icon');
 
-// --- 2. MULTI-WINDOW APPLICATION CONTROLLERS (MAC STYLE) ---
-function registerWindowControls(shortcut, win, tab, closeBtn, minBtn, maxBtn, focusCallback) {
-    // Close Window
-    closeBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        win.style.display = 'none';
-        tab.style.display = 'none';
-    });
-    
-    // Minimize Window
-    minBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        win.style.display = 'none';
-        tab.classList.remove('active');
-    });
+        pText.innerText = message;
+        if (pTitle) pTitle.innerText = title;
+        if (pIcon) pIcon.innerText = icon;
 
-    // Maximize/Restore Toggle Window
-    maxBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (win.style.width === '100vw') {
-            win.style.width = win.dataset.oldWidth || '';
-            win.style.height = win.dataset.oldHeight || '';
-            win.style.top = '50%';
-            win.style.left = '50%';
-            win.style.transform = win.dataset.oldTransform || 'translate(-50%, -50%)';
-        } else {
-            win.dataset.oldWidth = win.style.width;
-            win.dataset.oldHeight = win.style.height;
-            win.dataset.oldTransform = win.style.transform;
-            win.style.width = '100vw';
-            win.style.height = 'calc(100vh - 42px)';
-            win.style.top = '0';
-            win.style.left = '0';
-            win.style.transform = 'none';
-        }
-    });
+        popup.style.display = 'block';
 
-    // Taskbar and Shortcut toggles
-    shortcut.addEventListener('dblclick', () => {
-        win.style.display = 'flex';
-        tab.style.display = 'block';
-        bringToFront(win);
-        if (focusCallback) focusCallback();
-    });
-
-    tab.addEventListener('click', () => {
-        if (win.style.display === 'none' || !tab.classList.contains('active')) {
-            win.style.display = 'flex';
-            bringToFront(win);
-            if (focusCallback) focusCallback();
-        } else {
-            win.style.display = 'none';
-            tab.classList.remove('active');
-        }
-    });
-
-    win.addEventListener('mousedown', () => bringToFront(win));
-}
-
-function bringToFront(windowEl) {
-    document.querySelectorAll('.window').forEach(win => win.style.zIndex = "10");
-    document.querySelectorAll('.taskbar-tab').forEach(t => t.classList.remove('active'));
-    
-    windowEl.style.zIndex = "20";
-    if (windowEl === mainTerminal) tabTerminal.classList.add('active');
-    if (windowEl === videoWindow) tabVideo.classList.add('active');
-    if (windowEl === gameWindow) tabGame.classList.add('active');
-    if (windowEl === guessWindow) tabGuess.classList.add('active');
-}
-
-registerWindowControls(terminalShortcut, mainTerminal, tabTerminal, closeTerminalBtn, minTerminalBtn, maxTerminalBtn, () => terminalInput.focus());
-registerWindowControls(videoShortcut, videoWindow, tabVideo, closeVideoBtn, minVideoBtn, maxVideoBtn);
-registerWindowControls(gameShortcut, gameWindow, tabGame, closeGameBtn, minGameBtn, maxGameBtn, () => startGameLoop());
-registerWindowControls(guessShortcut, guessWindow, tabGuess, closeGuessBtn, minGuessBtn, maxGuessBtn);
-
-// --- 3. CORE TERMINAL INTERACTION LOGIC ---
-terminalInput.addEventListener('keydown', function(event) {
-    if (event.key === 'Enter') {
-        const rawInput = terminalInput.value.trim();
-        const commandArgs = rawInput.toLowerCase().split(' ');
-        const command = commandArgs[0];
-        
-        const userLine = document.createElement('p');
-        userLine.className = 'glowing-text';
-        userLine.innerText = `NASA_USER_>$ ${rawInput}`;
-        terminalBody.insertBefore(userLine, terminalInput.parentElement);
-
-        const responseLine = document.createElement('p');
-        responseLine.className = 'glowing-text';
-
-        if (command === 'help') {
-            responseLine.innerText = 
-                '> AVAILABLE COMMANDS:\n' +
-                '> [status] - Check core satellite systems\n' +
-                '> [rover]  - Fetch Mars Rover tracking details\n' +
-                '> [clear]  - Wipe terminal log data';
-        } else if (command === 'status') {
-            responseLine.innerText = '> ALL SYSTEMS NOMINAL. SATELLITE UPLINK: CONNECTED.';
-        } else if (command === 'rover') {
-            responseLine.innerText = '> LOCATION: GALE CRATER, MARS\n> BATTERY: 94%\n> MISSION STATUS: NOMINAL';
-        } else if (command === 'clear') {
-            const allParagraphs = terminalBody.querySelectorAll('p');
-            allParagraphs.forEach(p => p.remove());
-            terminalInput.value = '';
-            return;
-        } else if (command === '') {
-            responseLine.innerText = '';
-        } else {
-            responseLine.innerText = `> ERROR: COMMAND "${command}" NOT RECOGNIZED. TYPE "HELP".`;
-        }
-
-        terminalBody.insertBefore(responseLine, terminalInput.parentElement);
-        terminalInput.value = '';
-        terminalBody.scrollTop = terminalBody.scrollHeight;
+        if (window.popupTimeout) clearTimeout(window.popupTimeout);
+        window.popupTimeout = setTimeout(() => { popup.style.display = 'none'; }, 5000);
     }
-});
 
-// --- 4. ENGINE 1: UPGRADED ALIEN BLASTER (LIVES & VECTOR GRAPHICS) ---
-let gameInterval;
-let shipX = canvas.width / 2 - 15;
-let lasers = [];
-let aliens = [];
-let keys = {};
-let gameScore = 0;
-let playerLives = 3;
-let isGameOver = false;
-let screenFlash = 0;
-
-document.addEventListener('keydown', (e) => { if (gameWindow.style.display === 'flex') keys[e.key] = true; });
-document.addEventListener('keyup', (e) => { 
-    if (gameWindow.style.display === 'flex') keys[e.key] = false;
-    if (e.key === ' ' && gameWindow.style.display === 'flex' && !isGameOver) {
-        lasers.push({x: shipX + 15, y: canvas.height - 25});
-    }
-});
-
-function spawnAlien() {
-    if (gameWindow.style.display === 'flex' && aliens.length < 6 && !isGameOver) {
-        aliens.push({
-            x: Math.random() * (canvas.width - 30), 
-            y: -20, 
-            speed: 1.5 + Math.random() * 2,
-            animFrame: 0
+    const closePopupBtn = document.getElementById('close-popup');
+    if (closePopupBtn) {
+        closePopupBtn.addEventListener('click', () => {
+            const popup = document.getElementById('system-popup');
+            if (popup) popup.style.display = 'none';
         });
     }
-}
-setInterval(spawnAlien, 1200);
 
-function startGameLoop() {
-    clearInterval(gameInterval);
-    shipX = canvas.width / 2 - 15;
-    lasers = []; aliens = []; gameScore = 0;
-    playerLives = 3; isGameOver = false; screenFlash = 0;
-    gameInterval = setInterval(updateGame, 1000 / 30);
-}
+    /* --- DYNAMIC FINDER RENDER ENGINE --- */
+    function renderFinderDirectory(dirKey) {
+        const viewPort = document.getElementById('finder-file-viewport');
+        const pathTitle = document.getElementById('finder-title-path');
+        const viewHeading = document.getElementById('finder-current-heading');
+        if (!viewPort) return;
 
-// Vector Render Method for High Tech Star Fighter Design
-function drawSciFiShip(x, y) {
-    ctx.shadowBlur = 8;
-    ctx.shadowColor = '#00ff66';
-    ctx.fillStyle = '#00ff66';
-    
-    ctx.beginPath();
-    ctx.moveTo(x + 15, y);       // Nose cone spike
-    ctx.lineTo(x + 22, y + 10);  // Right cockpit panel
-    ctx.lineTo(x + 30, y + 18);  // Right swept wing tip
-    ctx.lineTo(x + 22, y + 18);  // Right thruster engine node
-    ctx.lineTo(x + 18, y + 24);  // Central hyperdrive stabilizer
-    ctx.lineTo(x + 12, y + 24);  
-    ctx.lineTo(x + 8, y + 18);   // Left thruster node
-    ctx.lineTo(x, y + 18);       // Left swept wing tip
-    ctx.lineTo(x + 8, y + 10);   // Left cockpit panel
-    ctx.closePath();
-    ctx.fill();
-    ctx.shadowBlur = 0; // Reset shadow array loops
-}
+        // Sync visual sidebar state
+        document.querySelectorAll('.finder-sidebar .sidebar-item').forEach(item => {
+            if (item.getAttribute('data-dir') === dirKey) {
+                item.classList.add('active');
+            } else {
+                item.classList.remove('active');
+            }
+        });
 
-// Vector Render Method for Custom Space Monster/Alien
-function drawAlienInvader(x, y) {
-    ctx.fillStyle = '#ff3366';
-    ctx.shadowBlur = 6;
-    ctx.shadowColor = '#ff3366';
-    
-    // Core alien shell graphic matrix mapping
-    ctx.fillRect(x + 6, y, 12, 4);
-    ctx.fillRect(x + 4, y + 4, 16, 4);
-    ctx.fillRect(x, y + 8, 24, 4);
-    ctx.fillRect(x, y + 12, 6, 4);
-    ctx.fillRect(x + 9, y + 12, 6, 4);
-    ctx.fillRect(x + 18, y + 12, 6, 4);
-    ctx.fillRect(x, y + 16, 4, 4);
-    ctx.fillRect(x + 20, y + 16, 4, 4);
+        // Update breadcrumb texts
+        if (pathTitle) pathTitle.innerText = `Finder — root/${dirKey}/`;
+        if (viewHeading) viewHeading.innerText = `${dirKey.toUpperCase()} Directory Matrix`;
 
-    ctx.fillStyle = '#000000'; // Alien laser target eyes
-    ctx.fillRect(x + 6, y + 4, 2, 2);
-    ctx.fillRect(x + 16, y + 4, 2, 2);
-    ctx.shadowBlur = 0;
-}
+        // Empty current view
+        viewPort.innerHTML = "";
 
-function updateGame() {
-    if (isGameOver) {
-        // Render retro arcade style Game Over interface modal block
-        ctx.fillStyle = 'rgba(0,0,0,0.7)';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
-        ctx.fillStyle = '#ff3366';
-        ctx.font = 'bold 24px "Courier New"';
-        ctx.textAlign = 'center';
-        ctx.fillText("CRITICAL IMPACT: GAME OVER", canvas.width / 2, canvas.height / 2 - 10);
-        
-        ctx.fillStyle = '#00ff66';
-        ctx.font = '12px "Courier New"';
-        ctx.fillText("DOUBLE-CLICK SHORTCUT TO REBOOT SYSTEM", canvas.width / 2, canvas.height / 2 + 20);
-        ctx.textAlign = 'left'; // Reset alignment pointer mapping rules
-        return;
-    }
-
-    // Handle user positional tracking movement loops
-    if (keys['ArrowLeft'] && shipX > 0) shipX -= 6;
-    if (keys['ArrowRight'] && shipX < canvas.width - 30) shipX += 6;
-
-    // Advance projectiles physics matrices
-    lasers.forEach((l, li) => {
-        l.y -= 9;
-        if (l.y < 0) lasers.splice(li, 1);
-    });
-
-    // Advance enemy entity states
-    aliens.forEach((a, ai) => {
-        a.y += a.speed;
-        
-        // Dynamic impact vector checking against player base coordinates
-        if (a.y > canvas.height - 35 && a.x > shipX - 18 && a.x < shipX + 24) {
-            aliens.splice(ai, 1);
-            playerLives--;
-            screenFlash = 4; // Trigger execution flash loop flag
-            if (playerLives <= 0) isGameOver = true;
-        } else if (a.y > canvas.height) {
-            aliens.splice(ai, 1);
+        const files = virtualFileSystem[dirKey] || [];
+        if (files.length === 0) {
+            viewPort.innerHTML = `<p style="color: rgba(255,255,255,0.3); font-size: 13px; grid-column: 1/-1; margin: 12px 4px;">Directory is completely empty.</p>`;
+            return;
         }
 
-        // Projectile targeting overlap array intersections checking loop
-        lasers.forEach((l, li) => {
-            if (l.x > a.x && l.x < a.x + 24 && l.y > a.y && l.y < a.y + 20) {
-                aliens.splice(ai, 1);
-                lasers.splice(li, 1);
-                gameScore += 10;
+        // Generate files
+        files.forEach(file => {
+            const fileItem = document.createElement('div');
+            fileItem.className = 'file-item';
+            fileItem.innerText = file.name;
+            fileItem.addEventListener('click', () => {
+                triggerOSPopup(file.name, file.desc, "🔍");
+            });
+            viewPort.appendChild(fileItem);
+        });
+    }
+
+    // Bind sidebar clicks
+    document.querySelectorAll('.finder-sidebar .sidebar-item').forEach(item => {
+        item.addEventListener('click', () => {
+            const targetDir = item.getAttribute('data-dir');
+            renderFinderDirectory(targetDir);
+        });
+    });
+
+    // HOOKING TRASH TO OPEN INSIDE FINDER
+    const dockTrashBtn = document.getElementById('dock-trash');
+    if (dockTrashBtn) {
+        dockTrashBtn.addEventListener('click', () => {
+            const finderWin = document.getElementById('window-finder');
+            if (finderWin) {
+                finderWin.style.display = 'flex';
+                bringWindowToFront(finderWin);
+                renderFinderDirectory('trash');
+                triggerOSPopup("Finder Routing", "Redirected filesystem pipeline directly to Trash Can directory.", "🗑️");
+            }
+        });
+    }
+
+    // Load Default Finder View
+    renderFinderDirectory('desktop');
+
+    /* --- REALTIME CLOCK TIMELINE --- */
+    function updateMacClock() {
+        const clock = document.getElementById('live-clock');
+        if (!clock) return;
+        const now = new Date();
+        let hours = now.getHours();
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12 || 12;
+        clock.innerText = `${String(hours).padStart(2, '0')}:${minutes} ${ampm}`;
+    }
+    setInterval(updateMacClock, 1000);
+    updateMacClock();
+
+    /* --- HARDWARE COMPATIBILITY DIAGNOSTICS --- */
+    function detectClientHardware() {
+        const hardwareRow = document.getElementById('spec-hardware');
+        const osRow = document.getElementById('spec-os');
+        const browserRow = document.getElementById('spec-browser');
+        
+        if (hardwareRow) hardwareRow.innerText = "HP Workstation Core Hub";
+
+        const userAgent = navigator.userAgent;
+        let detectedOS = "Windows Environment Framework";
+        let detectedBrowser = "Secure Web Engine";
+
+        if (userAgent.indexOf("Win") !== -1) detectedOS = "Windows Core Workspace";
+        if (userAgent.indexOf("Mac") !== -1) detectedOS = "macOS Matrix Core";
+        if (userAgent.indexOf("X11") !== -1 || userAgent.indexOf("Linux") !== -1) detectedOS = "Linux Matrix Framework";
+
+        if (userAgent.indexOf("Chrome") !== -1 && userAgent.indexOf("Edg") === -1) detectedBrowser = "Chromium Engine Workspace";
+        else if (userAgent.indexOf("Safari") !== -1 && userAgent.indexOf("Chrome") === -1) detectedBrowser = "WebKit Safari Core";
+        else if (userAgent.indexOf("Firefox") !== -1) detectedBrowser = "Gecko Firefox Core";
+        else if (userAgent.indexOf("Edg") !== -1) detectedBrowser = "Microsoft Edge Pipeline";
+
+        if (osRow) osRow.innerText = detectedOS;
+        if (browserRow) browserRow.innerText = detectedBrowser;
+    }
+    detectClientHardware();
+
+    /* --- SAFE INTERACTIVE DRAG AND DROP HANDLERS --- */
+    function configureDragMechanics() {
+        document.querySelectorAll('.desktop-shortcut').forEach(item => {
+            item.addEventListener('dragstart', (e) => {
+                activelyDraggedElementId = item.id;
+                isDraggingFromDock = false;
+                e.dataTransfer.setData('text/plain', item.id);
+                item.style.opacity = "0.4";
+            });
+            item.addEventListener('dragend', () => { item.style.opacity = "1"; });
+        });
+
+        document.querySelectorAll('.dock-item').forEach(item => {
+            item.addEventListener('dragstart', (e) => {
+                activelyDraggedElementId = item.id;
+                isDraggingFromDock = true;
+                e.dataTransfer.setData('text/plain', item.id);
+                item.style.opacity = "0.5";
+            });
+            item.addEventListener('dragend', () => { item.style.opacity = "1"; });
+        });
+    }
+    configureDragMechanics();
+
+    const trashBinZone = document.getElementById('dock-trash');
+    if (trashBinZone) {
+        trashBinZone.addEventListener('dragover', (e) => { e.preventDefault(); trashBinZone.classList.add('drag-over-trash'); });
+        trashBinZone.addEventListener('dragleave', () => { trashBinZone.classList.remove('drag-over-trash'); });
+        trashBinZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            trashBinZone.classList.remove('drag-over-trash');
+            if (!activelyDraggedElementId) return;
+
+            const elementToKill = document.getElementById(activelyDraggedElementId);
+            if (elementToKill) {
+                const itemName = elementToKill.querySelector('span')?.innerText || elementToKill.getAttribute('data-name') || "Item File Node";
+                
+                // Add item to virtual file system database dynamically!
+                virtualFileSystem.trash.push({ name: `🗑️ discarded_${itemName.toLowerCase()}.bak`, desc: "Purged resource instance pointer element." });
+                
+                // Refresh finder UI if open
+                renderFinderDirectory('trash');
+
+                if (isDraggingFromDock) {
+                    triggerOSPopup("Trash Can", `Link removed from Dock module.`, "🗑️");
+                    elementToKill.remove();
+                } else {
+                    triggerOSPopup("Trash Can", "Moved item to clean storage grid container inside Finder.", "🗑️");
+                    elementToKill.style.display = "none";
+                }
+            }
+            activelyDraggedElementId = null;
+        });
+    }
+
+    /* --- SYSTEM OPTIONS POPUP CONTEXT MATRIX --- */
+    const workspace = document.getElementById('desktop-bg');
+    const ctxMenu = document.getElementById('desktop-menu');
+
+    if (workspace && ctxMenu) {
+        workspace.addEventListener('contextmenu', (e) => {
+            if (e.target.className.includes('desktop-workspace')) {
+                e.preventDefault();
+                ctxMenu.style.left = e.clientX + "px";
+                ctxMenu.style.top = e.clientY + "px";
+                ctxMenu.style.display = "flex";
+            }
+        });
+        document.addEventListener('click', () => { ctxMenu.style.display = "none"; });
+    }
+
+    document.querySelectorAll('.context-item').forEach(menuItem => {
+        menuItem.addEventListener('click', () => {
+            const action = menuItem.getAttribute('data-action');
+            if (action === 'clean-desktop') return;
+
+            let targetId = "";
+            if (action === 'add-finder') targetId = 'shortcut-finder';
+            if (action === 'add-terminal') targetId = 'shortcut-terminal';
+            if (action === 'add-games') targetId = 'shortcut-games';
+            if (action === 'add-settings') targetId = 'shortcut-settings';
+
+            const shortcut = document.getElementById(targetId);
+            if (shortcut) {
+                shortcut.style.display = "flex";
+                triggerOSPopup("Launchpad Core", "Restored component file node framework.", "✨");
             }
         });
     });
 
-    // Canvas graphic generation draw passes
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Screen hit shake damage effect canvas wrapper logic overlay
-    if (screenFlash > 0) {
-        ctx.fillStyle = 'rgba(255, 0, 85, 0.3)';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        screenFlash--;
-    }
-
-    // Render operations passes elements
-    drawSciFiShip(shipX, canvas.height - 28);
-    lasers.forEach(l => {
-        ctx.fillStyle = '#00ff66';
-        ctx.fillRect(l.x - 1, l.y, 3, 8);
-    });
-    aliens.forEach(a => drawAlienInvader(a.x, a.y));
-
-    // UI Dashboards tracking render pass
-    ctx.fillStyle = '#00ff66';
-    ctx.font = '12px "Courier New"';
-    ctx.fillText(`SCORE: ${gameScore}`, 10, 20);
-    
-    // Draw life tracker nodes on header panel
-    ctx.fillText("MODULES:", canvas.width - 140, 20);
-    for(let i=0; i < playerLives; i++) {
-        drawSciFiShip(canvas.width - 75 + (i * 22), 8);
-    }
-}
-
-// --- 5. ENGINE 2: GUESS THE NUMBER FREQUENCY DECRYPTOR ---
-let secretCode; let attemptsLeft;
-function initGuessGame() {
-    secretCode = Math.floor(Math.random() * 100) + 1;
-    attemptsLeft = 7;
-    guessAttempts.innerText = `CELL POWER REMAINING: ${attemptsLeft}`;
-    guessHint.innerText = ''; guessInput.value = ''; guessInput.disabled = false;
-    guessBtn.style.display = 'inline-block'; guessResetBtn.style.display = 'none';
-}
-guessBtn.addEventListener('click', () => {
-    const playerGuess = parseInt(guessInput.value);
-    if (isNaN(playerGuess) || playerGuess < 1 || playerGuess > 100) {
-        guessHint.innerText = '> INVALID FREQUENCY DATA BOUNDS.'; return;
-    }
-    attemptsLeft--;
-    if (playerGuess === secretCode) {
-        guessHint.innerText = `> SUCCESS!! SIGNAL ACQUIRED ON FREQUENCY [${secretCode}].`;
-        guessHint.style.color = '#00ff66'; endGuessGame();
-    } else if (attemptsLeft <= 0) {
-        guessHint.innerText = `> DECRYPTION TIMEOUT. SIGNAL LOST. FREQ WAS [${secretCode}].`;
-        guessHint.style.color = '#ff3366'; endGuessGame();
-    } else {
-        guessHint.style.color = '#ffcc00';
-        guessHint.innerText = playerGuess > secretCode ? '> TARGET FREQUENCY IS LOWER.' : '> TARGET FREQUENCY IS HIGHER.';
-        guessAttempts.innerText = `CELL POWER REMAINING: ${attemptsLeft}`;
-    }
-});
-function endGuessGame() { guessInput.disabled = true; guessBtn.style.display = 'none'; guessResetBtn.style.display = 'inline-block'; }
-guessResetBtn.addEventListener('click', initGuessGame);
-initGuessGame();
-
-// --- 6. UNIVERSAL WINDOW DRAG & RESIZE INFRASTRUCTURE (MAC STYLING COMPATIBLE) ---
-function setupWindowInfrastructure(headerId, windowId, width, height) {
-    const dragItem = document.getElementById(headerId);
-    const container = document.getElementById(windowId);
-    const resizeHandle = container.querySelector('.resize-handle');
-
-    let xOffset = -(width / 2); let yOffset = -(height / 2);
-    container.style.transform = `translate3d(${xOffset}px, ${yOffset}px, 0)`;
-    container.style.width = `${width}px`; container.style.height = `${height}px`;
-
-    let isDragging = false; let isResizing = false;
-    let currentX = xOffset; let currentY = yOffset;
-    let initialX = 0; let initialY = 0;
-    let startWidth = 0; let startHeight = 0;
-
-    // Mouse Down For Window Dragging Engine
-    dragItem.addEventListener("mousedown", (e) => {
-        if(e.target.classList.contains('mac-dot')) return;
-        initialX = e.clientX - xOffset;
-        initialY = e.clientY - yOffset;
-        isDragging = true;
-        bringToFront(container);
+    /* --- SECURE SYSTEM SETTINGS PANEL MODULATION --- */
+    document.querySelectorAll('.settings-nav-item').forEach(item => {
+        item.addEventListener('click', () => {
+            document.querySelectorAll('.settings-nav-item').forEach(nav => nav.classList.remove('active'));
+            document.querySelectorAll('.settings-tab-panel').forEach(panel => panel.style.display = 'none');
+            item.classList.add('active');
+            const target = document.getElementById(item.getAttribute('data-tab'));
+            if (target) target.style.display = 'block';
+        });
     });
 
-    // Mouse Down For Corner Resizing Engine Handles
-    if (resizeHandle) {
-        resizeHandle.addEventListener("mousedown", (e) => {
-            e.preventDefault(); e.stopPropagation();
-            startWidth = parseInt(document.defaultView.getComputedStyle(container).width, 10);
-            startHeight = parseInt(document.defaultView.getComputedStyle(container).height, 10);
-            initialX = e.clientX;
-            initialY = e.clientY;
-            isResizing = true;
-            bringToFront(container);
+    document.querySelectorAll('.wp-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const bg = document.getElementById('desktop-bg');
+            if (!bg) return;
+            bg.classList.remove('bg-space', 'bg-nebula', 'bg-terminal');
+            bg.classList.add(`bg-${btn.getAttribute('data-color')}`);
+        });
+    });
+
+    /* --- HIGHLY PREVENTATIVE SYSTEM ARCADE HOOKS --- */
+    document.querySelectorAll('.arcade-nav-item').forEach(item => {
+        item.addEventListener('click', () => {
+            document.querySelectorAll('.arcade-nav-item').forEach(nav => nav.classList.remove('active'));
+            document.querySelectorAll('.arcade-panel').forEach(panel => panel.style.display = 'none');
+            item.classList.add('active');
+            const targetGame = item.getAttribute('data-game');
+            const targetPanel = document.getElementById(targetGame);
+            if (targetPanel) targetPanel.style.display = 'block';
+            
+            if (targetGame === 'game-dodge') startDodgeGame();
+            else stopDodgeGame();
+        });
+    });
+
+    let crystalsCollected = 0;
+    const asteroidBtn = document.getElementById('asteroid-element');
+    if (asteroidBtn) {
+        asteroidBtn.addEventListener('click', () => {
+            crystalsCollected++;
+            const countDisplay = document.getElementById('crystal-count');
+            if (countDisplay) countDisplay.innerText = crystalsCollected;
         });
     }
 
-    document.addEventListener("mouseup", () => {
-        if (isDragging) { initialX = currentX; initialY = currentY; isDragging = false; }
-        if (isResizing) { isResizing = false; }
-    });
+    let dodgeInterval = null;
+    function startDodgeGame() {
+        stopDodgeGame();
+        let oTop = -30;
+        dodgeInterval = setInterval(() => {
+            oTop += 5;
+            const obstacle = document.getElementById('dodge-obstacle');
+            if (obstacle) obstacle.style.top = oTop + "px";
+            if (oTop > 140) oTop = -30;
+        }, 50);
+    }
+    function stopDodgeGame() { 
+        if (dodgeInterval) clearInterval(dodgeInterval); 
+    }
 
-    document.addEventListener("mousemove", (e) => {
-        if (isDragging && container.style.width !== '100vw') {
-            e.preventDefault();
-            currentX = e.clientX - initialX;
-            currentY = e.clientY - initialY;
-            xOffset = currentX; yOffset = currentY;
-            container.style.transform = `translate3d(${currentX}px, ${currentY}px, 0)`;
-        }
-        if (isResizing) {
-            e.preventDefault();
-            const newWidth = startWidth + (e.clientX - initialX);
-            const newHeight = startHeight + (e.clientY - initialY);
-            container.style.width = `${newWidth}px`;
-            container.style.height = `${newHeight}px`;
-        }
-    });
-}
+    /* --- DRAGGABLE WINDOW SYSTEM REGISTER MANAGER --- */
+    function wireMacWindow(triggerId, windowId) {
+        const trigger = document.getElementById(triggerId);
+        const win = document.getElementById(windowId);
+        if (!trigger || !win) return;
 
-// Map parameters layout to configuration loaders initialization pass
-setupWindowInfrastructure("terminal-header", "main-terminal", 650, 450);
-setupWindowInfrastructure("video-header", "video-window", 550, 380);
-setupWindowInfrastructure("game-header", "game-window", 510, 410);
-setupWindowInfrastructure("guess-header", "guess-window", 400, 260);
+        trigger.addEventListener('click', () => {
+            win.style.display = 'flex';
+            bringWindowToFront(win);
+        });
+
+        const closeBtn = win.querySelector('.close-btn');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                win.style.display = 'none';
+                if (windowId === 'window-games') stopDodgeGame();
+            });
+        }
+        
+        const header = win.querySelector('.window-header');
+        if (header) makeWindowDraggable(header, win);
+    }
+
+    function bringWindowToFront(target) {
+        document.querySelectorAll('.mac-window').forEach(w => w.style.zIndex = "100");
+        target.style.zIndex = "200";
+    }
+
+    function makeWindowDraggable(header, targetWin) {
+        let posX = 0, posY = 0, mouseX = 0, mouseY = 0;
+        header.onmousedown = (e) => {
+            if (e.target.className.includes('dot')) return;
+            e.preventDefault(); 
+            mouseX = e.clientX; 
+            mouseY = e.clientY;
+            document.onmouseup = () => { 
+                document.onmouseup = null; 
+                document.onmousemove = null; 
+            };
+            document.onmousemove = (ev) => {
+                ev.preventDefault();
+                posX = mouseX - ev.clientX; 
+                posY = mouseY - ev.clientY;
+                mouseX = ev.clientX; 
+                mouseY = ev.clientY;
+                targetWin.style.top = (targetWin.offsetTop - posY) + "px";
+                targetWin.style.left = (targetWin.offsetLeft - posX) + "px";
+            };
+        };
+    }
+
+    wireMacWindow('shortcut-finder', 'window-finder'); 
+    wireMacWindow('dock-finder', 'window-finder');
+    wireMacWindow('shortcut-terminal', 'window-terminal'); 
+    wireMacWindow('dock-terminal', 'window-terminal');
+    wireMacWindow('shortcut-games', 'window-games'); 
+    wireMacWindow('dock-games', 'window-games');
+    wireMacWindow('shortcut-settings', 'window-settings'); 
+    wireMacWindow('dock-settings', 'window-settings');
+
+    /* --- RADAR LOOP TIMELINE --- */
+    let radarProgress = 0;
+    setInterval(() => {
+        radarProgress += 0.5; 
+        if (radarProgress > 100) radarProgress = 0;
+        const dot = document.getElementById('satellite-dot');
+        if (dot) {
+            dot.style.left = `${radarProgress}%`;
+            dot.style.top = `${50 + Math.sin(radarProgress * 0.2) * 20}%`;
+        }
+    }, 100);
+});
