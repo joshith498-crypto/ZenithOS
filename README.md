@@ -8,8 +8,8 @@ Welcome to the **NASA Mission Control OS**, an interactive, retro-themed cockpit
 
 You can run this operating system directly in your web browser without downloading or installing anything!
 
-1. Click the live website link in the **About** section on the right side of this GitHub page (or click the link below):
-   👉 **[PASTE YOUR LIVE GITHUB PAGES URL HERE]**
+1. Click the live website link below :
+   👉 ** https://joshith498-crypto.github.io/nasa-mission-control-os/**
 2. The system will boot up automatically. 
 3. Double-click any of the desktop shortcuts (like **Core Terminal** or **Alien Blaster**) to open the applications!
 
