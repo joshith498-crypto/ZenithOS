@@ -4,24 +4,50 @@ Welcome to the **NASA Mission Control OS**, an interactive, retro-themed cockpit
 
 ---
 
-## 💻 Core Features
+## 🚀 How to Launch the OS (Quick Start)
 
-* **Functional Terminal Subroutine:** Type commands like `help`, `status`, or `rover` to run live system diagnostics.
-* **Live Satellite Tracking Grid:** An interactive mapping interface utilizing vectorized tracking coordinates.
-* **Mac-Style Window Controls:** Full window management, including smooth dragging, corner resizing, maximizing, and minimizing to the taskbar.
+You can run this operating system directly in your web browser without downloading or installing anything!
+
+1. Click the live website link in the **About** section on the right side of this GitHub page (or click the link below):
+   👉 **[PASTE YOUR LIVE GITHUB PAGES URL HERE]**
+2. The system will boot up automatically. 
+3. Double-click any of the desktop shortcuts (like **Core Terminal** or **Alien Blaster**) to open the applications!
+
+*(Alternatively, if you want to run it locally: download the repository files, keep `index.html`, `style.css`, and `script.js` in the same folder, and double-click `index.html` to open it in any browser.)*
 
 ---
 
-## 👾 Embedded Applications & Controls
+## 🎮 How to Use the OS Interface
+
+Once the system boots, you can manage the interface just like a real desktop operating system:
+* **Move Windows:** Click and drag the top title bar of any application window to slide it around your screen.
+* **Resize Windows:** Click and drag the bottom-right corner of any window to adjust its dimensions dynamically.
+* **Mac-Style Controls:** Use the signature circular window dots in the top-left corner to **Close** (Red), **Minimize** to the taskbar (Yellow), or **Maximize** to full screen (Green).
+* **Taskbar Navigation:** Click any active application tab in the bottom taskbar dock to instantly restore or minimize it.
+
+---
+
+## 💻 Terminal System Commands
+
+Open up the central Core Terminal window and try running these active subroutines by typing them and hitting `Enter`:
+* `help` - Displays the full list of available mainframe commands.
+* `status` - Runs a diagnostic check on core system resources and networks.
+* `rover` - Establishes a simulated data downlink with active surface rovers.
+* `clear` - Clears the screen buffer and resets the terminal line entry.
+
+---
+
+## 👾 Embedded Mini-Games & Controls
 
 ### 🛸 Alien Blaster Arcade
 A custom HTML5 Canvas retro space shooter. Defend your command craft from incoming threats!
-* **Movement:** Left and Right Arrow keys
-* **Fire Weapon:** Spacebar
-* **System Metrics:** 3 ship modules (lives) per routine. Try to lock in the high score!
+* **Move Left/Right:** Use the `Left Arrow` and `Right Arrow` keys.
+* **Fire Main Battery:** Press the `Spacebar`.
+* **System Metrics:** You start with 3 ship modules (lives). Defeat incoming waves to secure the high score!
 
 ### 🔢 Frequency Decryptor
-A deep-space cryptographic signal game. Decrypt the incoming communication array before your system backup batteries completely deplete!
+A deep-space cryptographic signal game. Decrypt the incoming transmission matrix!
+* **Objective:** Guess the correct numerical frequency sequence (1-100) before your system backup batteries completely deplete!
 
 ---
 
