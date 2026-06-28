@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NASA Mission Control OS</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="scanlines"></div>
+
+    <div class="desktop">
+        
+        <div class="shortcuts-container">
+            <div class="shortcut" id="terminal-shortcut">
+                <div class="shortcut-icon">💻</div>
+                <div class="shortcut-label">Core Terminal</div>
+            </div>
+            <div class="shortcut" id="video-shortcut">
+                <div class="shortcut-icon">🛰️</div>
+                <div class="shortcut-label">Sat Stream</div>
+            </div>
+            <div class="shortcut" id="game-shortcut">
+                <div class="shortcut-icon">👾</div>
+                <div class="shortcut-label">Alien Blaster</div>
+            </div>
+            <div class="shortcut" id="guess-shortcut">
+                <div class="shortcut-icon">🔢</div>
+                <div class="shortcut-label">Decryptor</div>
+            </div>
+        </div>
+
+        <div class="window terminal-window" id="main-terminal">
+            <div class="window-header" id="terminal-header">
+                <div class="mac-controls">
+                    <span class="mac-dot mac-close" id="close-terminal-btn"></span>
+                    <span class="mac-dot mac-minimize" id="min-terminal-btn"></span>
+                    <span class="mac-dot mac-maximize" id="max-terminal-btn"></span>
+                </div>
+                <div class="header-title">CORE_SYSTEM_TERMINAL.EXE</div>
+            </div>
+            <div class="terminal-body">
+                <p class="glowing-text">> USER CONSOLE UPLINK SUCCESSFUL...</p>
+                <p class="glowing-text">> TYPE 'HELP' FOR SYSTEM COMMANDS.</p>
+                
+                <div class="input-line">
+                    <span class="prompt">NASA_USER_>$</span>
+                    <input type="text" id="terminal-input" autofocus>
+                </div>
+            </div>
+            <div class="resize-handle"></div>
+        </div>
+
+        <div class="window video-window" id="video-window" style="display: none;">
+            <div class="window-header" id="video-header">
+                <div class="mac-controls">
+                    <span class="mac-dot mac-close" id="close-video-btn"></span>
+                    <span class="mac-dot mac-minimize" id="min-video-btn"></span>
+                    <span class="mac-dot mac-maximize" id="max-video-btn"></span>
+                </div>
+                <div class="header-title">LIVE_SAT_FEED.RAW</div>
+            </div>
+            <div class="video-body">
+                <iframe src="https://www.openstreetmap.org/export/embed.html?bbox=-180%2C-60%2C180%2C80&amp;layer=cyclosm" title="Satellite Tracking Grid"></iframe>
+                <div class="video-overlay-coords">TARGET: GLOBAL_ORBIT_RADAR // STATUS: LINK_ESTABLISHED</div>
+            </div>
+            <div class="resize-handle"></div>
+        </div>
+
+        <div class="window game-window" id="game-window" style="display: none;">
+            <div class="window-header" id="game-header">
+                <div class="mac-controls">
+                    <span class="mac-dot mac-close" id="close-game-btn"></span>
+                    <span class="mac-dot mac-minimize" id="min-game-btn"></span>
+                    <span class="mac-dot mac-maximize" id="max-game-btn"></span>
+                </div>
+                <div class="header-title">ALIEN_BLASTER_v2.0</div>
+            </div>
+            <div class="game-body">
+                <canvas id="gameCanvas" width="480" height="320"></canvas>
+                <div class="game-controls-tip">← → Arrow Keys to Move // Space to Shoot</div>
+            </div>
+            <div class="resize-handle"></div>
+        </div>
+
+        <div class="window guess-window" id="guess-window" style="display: none;">
+            <div class="window-header" id="guess-header">
+                <div class="mac-controls">
+                    <span class="mac-dot mac-close" id="close-guess-btn"></span>
+                    <span class="mac-dot mac-minimize" id="min-guess-btn"></span>
+                    <span class="mac-dot mac-maximize" id="max-guess-btn"></span>
+                </div>
+                <div class="header-title">FREQUENCY_DECRYPTOR.EXE</div>
+            </div>
+            <div class="guess-body">
+                <p class="glowing-text">> DECRYPT DEEP SPACE FREQUENCY (1-100)</p>
+                <p id="guess-attempts" class="glowing-text">CELL POWER REMAINING: 7</p>
+                <p id="guess-hint" class="glowing-text" style="color: #ffcc00; min-height: 20px;"></p>
+                
+                <div class="guess-input-container">
+                    <input type="number" id="guess-input" min="1" max="100" placeholder="00">
+                    <button id="guess-btn">TRANSMIT</button>
+                </div>
+                <button id="guess-reset-btn" style="display:none;">REBOOT SYSTEM</button>
+            </div>
+            <div class="resize-handle"></div>
+        </div>
+
+        <div class="taskbar">
+            <div class="start-btn">🚀 NASA NET</div>
+            
+            <div class="taskbar-apps">
+                <div class="taskbar-tab active" id="tab-terminal">💻 Terminal</div>
+                <div class="taskbar-tab" id="tab-video" style="display: none;">🛰️ Sat Stream</div>
+                <div class="taskbar-tab" id="tab-game" style="display: none;">👾 Blaster</div>
+                <div class="taskbar-tab" id="tab-guess" style="display: none;">🔢 Decryptor</div>
+            </div>
+
+            <div class="system-clock" id="live-clock">00:00:00 AM</div>
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
