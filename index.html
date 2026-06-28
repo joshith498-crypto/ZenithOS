@@ -3,125 +3,209 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NASA Mission Control OS</title>
+    <title>NASA Retro macOS Orbit Environment</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body id="desktop-bg">
 
-    <div class="scanlines"></div>
-
-    <div class="desktop">
-        
-        <div class="shortcuts-container">
-            <div class="shortcut" id="terminal-shortcut">
-                <div class="shortcut-icon">💻</div>
-                <div class="shortcut-label">Core Terminal</div>
-            </div>
-            <div class="shortcut" id="video-shortcut">
-                <div class="shortcut-icon">🛰️</div>
-                <div class="shortcut-label">Sat Stream</div>
-            </div>
-            <div class="shortcut" id="game-shortcut">
-                <div class="shortcut-icon">👾</div>
-                <div class="shortcut-label">Alien Blaster</div>
-            </div>
-            <div class="shortcut" id="guess-shortcut">
-                <div class="shortcut-icon">🔢</div>
-                <div class="shortcut-label">Decryptor</div>
-            </div>
+    <div class="mac-menu-bar">
+        <div class="menu-left">
+            <span class="menu-item bold">🚀 NASA-OS</span>
+            <span class="menu-item">File</span>
+            <span class="menu-item">Diagnostics</span>
+            <span class="menu-item">Telemetry</span>
         </div>
-
-        <div class="window terminal-window" id="main-terminal">
-            <div class="window-header" id="terminal-header">
-                <div class="mac-controls">
-                    <span class="mac-dot mac-close" id="close-terminal-btn"></span>
-                    <span class="mac-dot mac-minimize" id="min-terminal-btn"></span>
-                    <span class="mac-dot mac-maximize" id="max-terminal-btn"></span>
-                </div>
-                <div class="header-title">CORE_SYSTEM_TERMINAL.EXE</div>
-            </div>
-            <div class="terminal-body">
-                <p class="glowing-text">> USER CONSOLE UPLINK SUCCESSFUL...</p>
-                <p class="glowing-text">> TYPE 'HELP' FOR SYSTEM COMMANDS.</p>
-                
-                <div class="input-line">
-                    <span class="prompt">NASA_USER_>$</span>
-                    <input type="text" id="terminal-input" autofocus>
-                </div>
-            </div>
-            <div class="resize-handle"></div>
+        <div class="menu-right">
+            <span class="menu-item" id="live-clock">00:00 AM</span>
         </div>
-
-        <div class="window video-window" id="video-window" style="display: none;">
-            <div class="window-header" id="video-header">
-                <div class="mac-controls">
-                    <span class="mac-dot mac-close" id="close-video-btn"></span>
-                    <span class="mac-dot mac-minimize" id="min-video-btn"></span>
-                    <span class="mac-dot mac-maximize" id="max-video-btn"></span>
-                </div>
-                <div class="header-title">LIVE_SAT_FEED.RAW</div>
-            </div>
-            <div class="video-body">
-                <iframe src="https://www.openstreetmap.org/export/embed.html?bbox=-180%2C-60%2C180%2C80&amp;layer=cyclosm" title="Satellite Tracking Grid"></iframe>
-                <div class="video-overlay-coords">TARGET: GLOBAL_ORBIT_RADAR // STATUS: LINK_ESTABLISHED</div>
-            </div>
-            <div class="resize-handle"></div>
-        </div>
-
-        <div class="window game-window" id="game-window" style="display: none;">
-            <div class="window-header" id="game-header">
-                <div class="mac-controls">
-                    <span class="mac-dot mac-close" id="close-game-btn"></span>
-                    <span class="mac-dot mac-minimize" id="min-game-btn"></span>
-                    <span class="mac-dot mac-maximize" id="max-game-btn"></span>
-                </div>
-                <div class="header-title">ALIEN_BLASTER_v2.0</div>
-            </div>
-            <div class="game-body">
-                <canvas id="gameCanvas" width="480" height="320"></canvas>
-                <div class="game-controls-tip">← → Arrow Keys to Move // Space to Shoot</div>
-            </div>
-            <div class="resize-handle"></div>
-        </div>
-
-        <div class="window guess-window" id="guess-window" style="display: none;">
-            <div class="window-header" id="guess-header">
-                <div class="mac-controls">
-                    <span class="mac-dot mac-close" id="close-guess-btn"></span>
-                    <span class="mac-dot mac-minimize" id="min-guess-btn"></span>
-                    <span class="mac-dot mac-maximize" id="max-guess-btn"></span>
-                </div>
-                <div class="header-title">FREQUENCY_DECRYPTOR.EXE</div>
-            </div>
-            <div class="guess-body">
-                <p class="glowing-text">> DECRYPT DEEP SPACE FREQUENCY (1-100)</p>
-                <p id="guess-attempts" class="glowing-text">CELL POWER REMAINING: 7</p>
-                <p id="guess-hint" class="glowing-text" style="color: #ffcc00; min-height: 20px;"></p>
-                
-                <div class="guess-input-container">
-                    <input type="number" id="guess-input" min="1" max="100" placeholder="00">
-                    <button id="guess-btn">TRANSMIT</button>
-                </div>
-                <button id="guess-reset-btn" style="display:none;">REBOOT SYSTEM</button>
-            </div>
-            <div class="resize-handle"></div>
-        </div>
-
-        <div class="taskbar">
-            <div class="start-btn">🚀 NASA NET</div>
-            
-            <div class="taskbar-apps">
-                <div class="taskbar-tab active" id="tab-terminal">💻 Terminal</div>
-                <div class="taskbar-tab" id="tab-video" style="display: none;">🛰️ Sat Stream</div>
-                <div class="taskbar-tab" id="tab-game" style="display: none;">👾 Blaster</div>
-                <div class="taskbar-tab" id="tab-guess" style="display: none;">🔢 Decryptor</div>
-            </div>
-
-            <div class="system-clock" id="live-clock">00:00:00 AM</div>
-        </div>
-
     </div>
 
-    <script src="script.js"></script>
+    <div class="desktop-workspace">
+        <div class="desktop-shortcut" id="shortcut-finder" draggable="true">
+            <div class="icon-wrapper">📁</div>
+            <span>Finder</span>
+        </div>
+        <div class="desktop-shortcut" id="shortcut-terminal" draggable="true">
+            <div class="icon-wrapper">💻</div>
+            <span>Terminal</span>
+        </div>
+        <div class="desktop-shortcut" id="shortcut-games" draggable="true">
+            <div class="icon-wrapper">🎮</div>
+            <span>Arcade</span>
+        </div>
+        <div class="desktop-shortcut" id="shortcut-settings" draggable="true">
+            <div class="icon-wrapper">⚙️</div>
+            <span>Settings</span>
+        </div>
+    </div>
+
+    <div class="mac-window" id="window-finder" style="display: none;">
+        <div class="window-header">
+            <div class="window-dots">
+                <div class="dot close-btn"></div>
+                <div class="dot min-btn"></div>
+                <div class="dot max-btn"></div>
+            </div>
+            <div class="window-title" id="finder-title-path">Finder — root/</div>
+        </div>
+        <div class="window-body finder-layout">
+            <div class="finder-sidebar">
+                <div class="sidebar-item active" data-dir="desktop">🖥️ Desktop</div>
+                <div class="sidebar-item" data-dir="documents">📄 Documents</div>
+                <div class="sidebar-item" data-dir="downloads">📥 Downloads</div>
+                <div class="sidebar-item" data-dir="system">💾 System Core</div>
+                <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.08); margin: 6px 0;">
+                <div class="sidebar-item" data-dir="trash" id="sidebar-trash-item">🗑️ Trash Can</div>
+            </div>
+            <div class="finder-content">
+                <h3 id="finder-current-heading">Desktop Nodes</h3>
+                <div class="file-grid" id="finder-file-viewport">
+                    </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mac-window" id="window-terminal" style="display: none;">
+        <div class="window-header">
+            <div class="window-dots">
+                <div class="dot close-btn"></div>
+                <div class="dot min-btn"></div>
+                <div class="dot max-btn"></div>
+            </div>
+            <div class="window-title">NASA User Terminal</div>
+        </div>
+        <div class="window-body terminal-body">
+            <div id="terminal-log">
+                <p class="glowing-text">NASA(R) Orbit Link Initialization v4.98...</p>
+                <p class="glowing-text">Type 'help' to see system commands.</p>
+            </div>
+            <div class="terminal-input-line">
+                <span class="glowing-text">NASA_USER_>$</span>
+                <input type="text" id="terminal-input" autofocus>
+            </div>
+        </div>
+    </div>
+
+    <div class="mac-window" id="window-games" style="display: none;">
+        <div class="window-header">
+            <div class="window-dots">
+                <div class="dot close-btn"></div>
+                <div class="dot min-btn"></div>
+                <div class="dot max-btn"></div>
+            </div>
+            <div class="window-title">Multi-Game Subsystem Arcade</div>
+        </div>
+        <div class="window-body arcade-layout">
+            <div class="arcade-sidebar">
+                <div class="arcade-nav-item active" data-game="game-miner">Asteroid Miner</div>
+                <div class="arcade-nav-item" data-game="game-dodge">Probe Dodger</div>
+                <div class="arcade-nav-item" data-game="game-bypass">Bypass Guess</div>
+            </div>
+            <div class="arcade-content">
+                <div class="arcade-panel" id="game-miner">
+                    <h3>Asteroid Crystal Miner</h3>
+                    <div id="asteroid-element">☄️</div>
+                    <div class="arcade-score">Crystals: <span id="crystal-count">0</span></div>
+                </div>
+                <div class="arcade-panel" id="game-dodge" style="display: none;">
+                    <h3>Deep Space Probe Dodger</h3>
+                    <div class="dodge-canvas">
+                        <div id="dodge-player">🚀</div>
+                        <div id="dodge-obstacle">🛰️</div>
+                    </div>
+                    <div class="dodge-controls">
+                        <button id="btn-left">◀ Left</button>
+                        <button id="btn-right">Right ▶</button>
+                    </div>
+                    <div class="arcade-score">Score: <span id="dodge-score">0</span></div>
+                </div>
+                <div class="arcade-panel" id="game-bypass" style="display: none;">
+                    <h3>Mainframe Frequency Bypass</h3>
+                    <p id="guess-feedback">Enter encryption key coordinate (1-50):</p>
+                    <div class="guess-form">
+                        <input type="number" id="guess-input" min="1" max="50">
+                        <button id="btn-guess">Transmit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mac-window" id="window-settings" style="display: none;">
+        <div class="window-header">
+            <div class="window-dots">
+                <div class="dot close-btn"></div>
+                <div class="dot min-btn"></div>
+                <div class="dot max-btn"></div>
+            </div>
+            <div class="window-title">System Settings</div>
+        </div>
+        <div class="window-body settings-layout">
+            <div class="settings-sidebar">
+                <div class="settings-nav-item active" data-tab="tab-wallpaper">Desktop Theme</div>
+                <div class="settings-nav-item" data-tab="tab-specs">Hardware Specs</div>
+                <div class="settings-nav-item" data-tab="tab-security">Firewall Security</div>
+            </div>
+            <div class="settings-content">
+                <div class="settings-tab-panel" id="tab-wallpaper">
+                    <h3>Select Workspace Matrix</h3>
+                    <div class="wallpaper-options">
+                        <button class="wp-btn" data-color="space">Deep Space Orbit Gradient</button>
+                        <button class="wp-btn" data-color="nebula">Cosmic Nebula Radiance</button>
+                        <button class="wp-btn" data-color="terminal">Retro Green Terminal Matrix</button>
+                    </div>
+                </div>
+                <div class="settings-tab-panel" id="tab-specs" style="display: none;">
+                    <h3>System Hardware Profile</h3>
+                    <div class="spec-list">
+                        <div class="spec-row"><span>Mainframe Architecture:</span> <span id="spec-hardware">Detecting...</span></div>
+                        <div class="spec-row"><span>Host Environment:</span> <span id="spec-os">Detecting...</span></div>
+                        <div class="spec-row"><span>Browser Gateway:</span> <span id="spec-browser">Detecting...</span></div>
+                    </div>
+                </div>
+                <div class="settings-tab-panel" id="tab-security" style="display: none;">
+                    <h3>Defensive Matrix Array</h3>
+                    <div class="setting-toggle-box">
+                        <span>Mainframe Quantum Firewall</span>
+                        <input type="checkbox" id="firewall-toggle" checked>
+                    </div>
+                    <p id="security-status" style="color: #00ff66; margin-top: 12px; font-size: 13px;">🛡️ Perimeter firewalls fully armored.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="desktop-context-menu" id="desktop-menu" style="display: none;">
+        <div class="context-item" data-action="clean-desktop">Align Workspace Grid</div>
+        <hr class="context-divider">
+        <div class="context-item" data-action="add-finder">Restore Finder Link</div>
+        <div class="context-item" data-action="add-terminal">Restore Terminal Link</div>
+        <div class="context-item" data-action="add-games">Restore Arcade Link</div>
+        <div class="context-item" data-action="add-settings">Restore Settings Link</div>
+    </div>
+
+    <div class="mac-notification" id="system-popup" style="display: none;">
+        <div class="notification-header">
+            <span class="notif-icon">🛰️</span>
+            <span class="notif-title">System Alert</span>
+            <span class="notif-close" id="close-popup">✕</span>
+        </div>
+        <div class="notification-body" id="popup-text">
+            Notification payload loaded successfully.
+        </div>
+    </div>
+
+    <div class="dock-container">
+        <div class="mac-dock">
+            <div class="dock-item" id="dock-finder" data-name="Finder">📁</div>
+            <div class="dock-item" id="dock-terminal" data-name="Terminal">💻</div>
+            <div class="dock-item" id="dock-games" data-name="Arcade">🎮</div>
+            <div class="dock-item" id="dock-settings" data-name="Settings">⚙️</div>
+            <div class="dock-separator"></div>
+            <div class="dock-trash-bin" id="dock-trash" data-name="Trash Can" style="cursor: pointer;">🗑️</div>
+        </div>
+    </div>
+
+    <script src="script.js" defer></script>
 </body>
 </html>
