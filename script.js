@@ -1,389 +1,396 @@
-document.addEventListener("DOMContentLoaded", () => {
+// --- CENTRALIZED STATE MANAGEMENT FRAMEWORK ---
+const SystemState = {
+    userAccount: localStorage.getItem('nasa_user') || 'Astronaut',
+    isLocked: true,
+    energyCrystals: 0,
+    currentPath: 'root/desktop/'
+};
 
-    const initialBg = document.getElementById('desktop-bg');
-    if (initialBg) initialBg.classList.add('bg-space');
+// --- INITIALIZE BOOT SEQUENCE ---
+document.addEventListener('DOMContentLoaded', () => {
+    injectLockScreen();
+    initializeClock();
+    setupWindowControls();
+    setupAppLaunchers();
+    setupWallpaperEngine();
+    setupArcadeModules();
+    setupTerminalConsole();
+});
 
-    let activelyDraggedElementId = null;
-    let isDraggingFromDock = false;
+// --- 1. CORE LOCK SCREEN & ACCOUNT MANAGEMENT ENGINE ---
+function injectLockScreen() {
+    // Check if account already exists in local storage
+    const storedPass = localStorage.getItem('nasa_pass');
+    const hasAccount = !!storedPass;
 
-    /* --- VIRTUAL DIRECTORY OS FILE SYSTEM REGISTRY --- */
-    const virtualFileSystem = {
-        desktop: [
-            { name: "📁 Finder.app Link", desc: "Core application pointer map to system paths." },
-            { name: "📁 Terminal.app Link", desc: "Command Line Pipeline to local runtime environment." },
-            { name: "📁 Arcade.app Link", desc: "Interactive game subroutines terminal container." },
-            { name: "📁 Settings.app Link", desc: "Global layout and perimeter defense configurations." }
-        ],
-        documents: [
-            { name: "📄 satellite_uplink.cfg", desc: "TARGET_IP=128.0.0.1\nPORT=9100\nENCRYPTION=AES_256_GCM\nSTATUS=TUNNEL_ESTABLISHED" },
-            { name: "📄 classified_blueprint.dat", desc: "DEEP_SPACE_OBJECT_ID: #498-CRYPTO\nOrbit: Mars Geo-Synchronous Grid\nPayload: Atmospheric Spectrometer" },
-            { name: "📄 warp_drive_core.log", desc: "Antimatter containment field operating at 98.4% cohesion accuracy." }
-        ],
-        downloads: [
-            { name: "📦 CSP_v3.0_Mod.zip", desc: "Assetto Corsa Custom Shaders Patch file container package." },
-            { name: "🎵 Space_Ambience_Retro.mp3", desc: "Looped ambient workspace theme audio file metadata stream." }
-        ],
-        system: [
-            { name: "⚙️ kernel_omni.sys", desc: "NASA Core Engine Subsystem Kernel running on architecture pipelines." },
-            { name: "⚙️ hardware_allocator.dll", desc: "Memory assignment parameters for local workstation matrix hardware mapping." }
-        ],
-        trash: [
-            { name: "🗑️ broken_telemetry_node.bak", desc: "Corrupted coordinate log. Discarded June 2026." }
-        ]
-    };
+    const lockHTML = `
+        <div id="system-lock-screen" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle, #0f172a 0%, #020617 100%); z-index: 9999999; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: sans-serif; color: #fff;">
+            <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); padding: 40px; border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); width: 340px; text-align: center; backdrop-filter: blur(20px);">
+                <div style="font-size: 50px; margin-bottom: 16px; animation: pulse 2s infinite;">🛰️</div>
+                <h2 id="lock-title" style="margin: 0 0 8px 0; font-size: 20px; font-weight: 500; color: #00ff66;">${hasAccount ? 'Access Terminal Locked' : 'Create Space Interface Account'}</h2>
+                <p id="lock-subtitle" style="margin: 0 0 24px 0; font-size: 13px; color: #64748b;">${hasAccount ? 'Enter clearance credentials' : 'Register core workstation user profile'}</p>
+                
+                <div style="display: flex; flex-direction: column; gap: 12px; width: 100%;">
+                    <input type="text" id="lock-user" placeholder="Account User ID" value="${hasAccount ? SystemState.userAccount : ''}" ${hasAccount ? 'disabled' : ''} style="width: 100%; background: #020617; border: 1px solid rgba(255,255,255,0.15); padding: 12px; border-radius: 8px; color: #00ff66; font-family: monospace; font-size: 14px; box-sizing: border-box; text-align: center; outline: none;">
+                    <input type="password" id="lock-pass" placeholder="Clearance Password" style="width: 100%; background: #020617; border: 1px solid rgba(255,255,255,0.15); padding: 12px; border-radius: 8px; color: #00ff66; font-family: monospace; font-size: 14px; box-sizing: border-box; text-align: center; outline: none;">
+                    <button id="lock-submit-btn" style="width: 100%; background: #00ff66; color: #000; font-weight: bold; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; transition: background 0.2s;">${hasAccount ? 'UNLOX MATRIX' : 'PROVISION NOW'}</button>
+                </div>
+                ${hasAccount ? '<p id="reset-profile" style="margin: 16px 0 0 0; font-size: 11px; color: #ef4444; cursor: pointer; text-decoration: underline;">Clear Current Account Profile</p>' : ''}
+            </div>
+        </div>
+    `;
 
-    /* --- SYSTEM NOTIFICATION BANNER ENGINE --- */
-    function triggerOSPopup(title, message, icon = "🛰️") {
-        const popup = document.getElementById('system-popup');
-        const pText = document.getElementById('popup-text');
-        if (!popup || !pText) return;
+    document.body.insertAdjacentHTML('beforeend', lockHTML);
 
-        const pTitle = popup.querySelector('.notif-title');
-        const pIcon = popup.querySelector('.notif-icon');
+    // Event Triggers
+    const submitBtn = document.getElementById('lock-submit-btn');
+    const passInput = document.getElementById('lock-pass');
+    
+    submitBtn.addEventListener('click', processSecurityClearance);
+    passInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') processSecurityClearance(); });
 
-        pText.innerText = message;
-        if (pTitle) pTitle.innerText = title;
-        if (pIcon) pIcon.innerText = icon;
-
-        popup.style.display = 'block';
-
-        if (window.popupTimeout) clearTimeout(window.popupTimeout);
-        window.popupTimeout = setTimeout(() => { popup.style.display = 'none'; }, 5000);
-    }
-
-    const closePopupBtn = document.getElementById('close-popup');
-    if (closePopupBtn) {
-        closePopupBtn.addEventListener('click', () => {
-            const popup = document.getElementById('system-popup');
-            if (popup) popup.style.display = 'none';
+    if (hasAccount) {
+        document.getElementById('reset-profile').addEventListener('click', () => {
+            localStorage.clear();
+            location.reload();
         });
     }
+}
 
-    /* --- DYNAMIC FINDER RENDER ENGINE --- */
-    function renderFinderDirectory(dirKey) {
-        const viewPort = document.getElementById('finder-file-viewport');
-        const pathTitle = document.getElementById('finder-title-path');
-        const viewHeading = document.getElementById('finder-current-heading');
-        if (!viewPort) return;
+function processSecurityClearance() {
+    const userField = document.getElementById('lock-user').value.trim();
+    const passField = document.getElementById('lock-pass').value.trim();
+    const storedPass = localStorage.getItem('nasa_pass');
 
-        // Sync visual sidebar state
-        document.querySelectorAll('.finder-sidebar .sidebar-item').forEach(item => {
-            if (item.getAttribute('data-dir') === dirKey) {
-                item.classList.add('active');
-            } else {
-                item.classList.remove('active');
-            }
-        });
+    if (!userField || !passField) {
+        showGlobalAlert("Fields cannot be left vacant.");
+        return;
+    }
 
-        // Update breadcrumb texts
-        if (pathTitle) pathTitle.innerText = `Finder — root/${dirKey}/`;
-        if (viewHeading) viewHeading.innerText = `${dirKey.toUpperCase()} Directory Matrix`;
-
-        // Empty current view
-        viewPort.innerHTML = "";
-
-        const files = virtualFileSystem[dirKey] || [];
-        if (files.length === 0) {
-            viewPort.innerHTML = `<p style="color: rgba(255,255,255,0.3); font-size: 13px; grid-column: 1/-1; margin: 12px 4px;">Directory is completely empty.</p>`;
-            return;
+    if (!storedPass) {
+        // Account Creation Routine
+        localStorage.setItem('nasa_user', userField);
+        localStorage.setItem('nasa_pass', passField);
+        SystemState.userAccount = userField;
+        showGlobalAlert("Account Profile Generated! Welcome to Core Command.");
+        document.getElementById('system-lock-screen').remove();
+        SystemState.isLocked = false;
+        loadHardwareTelemetry();
+    } else {
+        // Validation Routine
+        if (passField === storedPass) {
+            document.getElementById('system-lock-screen').remove();
+            SystemState.isLocked = false;
+            loadHardwareTelemetry();
+            showGlobalAlert(`Session unlocked. Welcome back, Node [${SystemState.userAccount}]`);
+        } else {
+            const container = document.getElementById('lock-pass').parentElement.parentElement;
+            container.style.animation = 'none';
+            setTimeout(() => container.style.animation = 'shake 0.4s ease', 10);
+            showGlobalAlert("SECURITY THREAT: Invalid Clearance Key.");
         }
-
-        // Generate files
-        files.forEach(file => {
-            const fileItem = document.createElement('div');
-            fileItem.className = 'file-item';
-            fileItem.innerText = file.name;
-            fileItem.addEventListener('click', () => {
-                triggerOSPopup(file.name, file.desc, "🔍");
-            });
-            viewPort.appendChild(fileItem);
-        });
     }
+}
 
-    // Bind sidebar clicks
-    document.querySelectorAll('.finder-sidebar .sidebar-item').forEach(item => {
-        item.addEventListener('click', () => {
-            const targetDir = item.getAttribute('data-dir');
-            renderFinderDirectory(targetDir);
-        });
-    });
+// --- 2. GLOBAL TELEMETRY CLOCK SYSTEM ---
+function initializeClock() {
+    const clockElement = document.getElementById('live-clock');
+    const updateTime = () => {
+        const d = new Date();
+        let h = d.getHours();
+        const m = String(d.getMinutes()).padStart(2, '0');
+        const ampm = h >= 12 ? 'PM' : 'AM';
+        h = h % 12 || 12;
+        if(clockElement) clockElement.textContent = `${h}:${m} ${ampm}`;
+    };
+    updateTime();
+    setInterval(updateTime, 1000);
+}
 
-    // HOOKING TRASH TO OPEN INSIDE FINDER
-    const dockTrashBtn = document.getElementById('dock-trash');
-    if (dockTrashBtn) {
-        dockTrashBtn.addEventListener('click', () => {
-            const finderWin = document.getElementById('window-finder');
-            if (finderWin) {
-                finderWin.style.display = 'flex';
-                bringWindowToFront(finderWin);
-                renderFinderDirectory('trash');
-                triggerOSPopup("Finder Routing", "Redirected filesystem pipeline directly to Trash Can directory.", "🗑️");
+// --- 3. HARDWARE TELEMETRY ANALYZER ---
+function loadHardwareTelemetry() {
+    // Updates diagnostic tab layout with verified parameters
+    const hardwareLabel = document.getElementById('spec-hardware');
+    const osLabel = document.getElementById('spec-os');
+    const browserLabel = document.getElementById('spec-browser');
+
+    if(hardwareLabel) hardwareLabel.textContent = "ThinkPad Framework Architecture (i3 Matrix)";
+    if(osLabel) osLabel.textContent = "NASA Core Linux Shell Embedded v6.0";
+    if(browserLabel) browserLabel.textContent = navigator.userAgent.split(" ").slice(-1)[0] || "Webkit Kernel Engine";
+}
+
+// --- 4. SECURE WINDOW INTERACTION ARCHITECTURE (MOVE/CLOSE/MIN) ---
+function setupWindowControls() {
+    const windows = document.querySelectorAll('.mac-window');
+    
+    windows.forEach(win => {
+        const header = win.querySelector('.window-header');
+        const closeBtn = win.querySelector('.close-btn');
+        const minBtn = win.querySelector('.min-btn');
+        const maxBtn = win.querySelector('.max-btn');
+
+        // Close Action Matrix
+        if(closeBtn) closeBtn.addEventListener('click', () => win.style.display = 'none');
+        if(minBtn) minBtn.addEventListener('click', () => win.style.display = 'none');
+        
+        // Maximize Action Matrix
+        if(maxBtn) maxBtn.addEventListener('click', () => {
+            if(win.style.width === '100vw') {
+                win.style.width = '620px';
+                win.style.height = '390px';
+                win.style.top = '15%';
+                win.style.left = '25%';
+            } else {
+                win.style.width = '100vw';
+                win.style.height = 'calc(100vh - 26px)';
+                win.style.top = '26px';
+                win.style.left = '0';
             }
         });
-    }
 
-    // Load Default Finder View
-    renderFinderDirectory('desktop');
-
-    /* --- REALTIME CLOCK TIMELINE --- */
-    function updateMacClock() {
-        const clock = document.getElementById('live-clock');
-        if (!clock) return;
-        const now = new Date();
-        let hours = now.getHours();
-        const minutes = String(now.getMinutes()).padStart(2, '0');
-        const ampm = hours >= 12 ? 'PM' : 'AM';
-        hours = hours % 12 || 12;
-        clock.innerText = `${String(hours).padStart(2, '0')}:${minutes} ${ampm}`;
-    }
-    setInterval(updateMacClock, 1000);
-    updateMacClock();
-
-    /* --- HARDWARE COMPATIBILITY DIAGNOSTICS --- */
-    function detectClientHardware() {
-        const hardwareRow = document.getElementById('spec-hardware');
-        const osRow = document.getElementById('spec-os');
-        const browserRow = document.getElementById('spec-browser');
-        
-        if (hardwareRow) hardwareRow.innerText = "HP Workstation Core Hub";
-
-        const userAgent = navigator.userAgent;
-        let detectedOS = "Windows Environment Framework";
-        let detectedBrowser = "Secure Web Engine";
-
-        if (userAgent.indexOf("Win") !== -1) detectedOS = "Windows Core Workspace";
-        if (userAgent.indexOf("Mac") !== -1) detectedOS = "macOS Matrix Core";
-        if (userAgent.indexOf("X11") !== -1 || userAgent.indexOf("Linux") !== -1) detectedOS = "Linux Matrix Framework";
-
-        if (userAgent.indexOf("Chrome") !== -1 && userAgent.indexOf("Edg") === -1) detectedBrowser = "Chromium Engine Workspace";
-        else if (userAgent.indexOf("Safari") !== -1 && userAgent.indexOf("Chrome") === -1) detectedBrowser = "WebKit Safari Core";
-        else if (userAgent.indexOf("Firefox") !== -1) detectedBrowser = "Gecko Firefox Core";
-        else if (userAgent.indexOf("Edg") !== -1) detectedBrowser = "Microsoft Edge Pipeline";
-
-        if (osRow) osRow.innerText = detectedOS;
-        if (browserRow) browserRow.innerText = detectedBrowser;
-    }
-    detectClientHardware();
-
-    /* --- SAFE INTERACTIVE DRAG AND DROP HANDLERS --- */
-    function configureDragMechanics() {
-        document.querySelectorAll('.desktop-shortcut').forEach(item => {
-            item.addEventListener('dragstart', (e) => {
-                activelyDraggedElementId = item.id;
-                isDraggingFromDock = false;
-                e.dataTransfer.setData('text/plain', item.id);
-                item.style.opacity = "0.4";
-            });
-            item.addEventListener('dragend', () => { item.style.opacity = "1"; });
+        // Window Layer Management Focus
+        win.addEventListener('mousedown', () => {
+            windows.forEach(w => w.style.zIndex = '1000');
+            win.style.zIndex = '2000';
         });
 
-        document.querySelectorAll('.dock-item').forEach(item => {
-            item.addEventListener('dragstart', (e) => {
-                activelyDraggedElementId = item.id;
-                isDraggingFromDock = true;
-                e.dataTransfer.setData('text/plain', item.id);
-                item.style.opacity = "0.5";
-            });
-            item.addEventListener('dragend', () => { item.style.opacity = "1"; });
+        // Native Window Dragging Implementation
+        let isDragging = false;
+        let startX, startY, initialLeft, initialTop;
+
+        header.addEventListener('mousedown', (e) => {
+            if(e.target.classList.contains('dot')) return;
+            isDragging = true;
+            startX = e.clientX;
+            startY = e.clientY;
+            initialLeft = win.offsetLeft;
+            initialTop = win.offsetTop;
+            document.styleSheets[0].insertRule('* { user-select: none !important; }', 0);
         });
-    }
-    configureDragMechanics();
 
-    const trashBinZone = document.getElementById('dock-trash');
-    if (trashBinZone) {
-        trashBinZone.addEventListener('dragover', (e) => { e.preventDefault(); trashBinZone.classList.add('drag-over-trash'); });
-        trashBinZone.addEventListener('dragleave', () => { trashBinZone.classList.remove('drag-over-trash'); });
-        trashBinZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            trashBinZone.classList.remove('drag-over-trash');
-            if (!activelyDraggedElementId) return;
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            const deltaX = e.clientX - startX;
+            const deltaY = e.clientY - startY;
+            win.style.left = `${initialLeft + deltaX}px`;
+            win.style.top = `${initialTop + deltaY}px`;
+        });
 
-            const elementToKill = document.getElementById(activelyDraggedElementId);
-            if (elementToKill) {
-                const itemName = elementToKill.querySelector('span')?.innerText || elementToKill.getAttribute('data-name') || "Item File Node";
-                
-                // Add item to virtual file system database dynamically!
-                virtualFileSystem.trash.push({ name: `🗑️ discarded_${itemName.toLowerCase()}.bak`, desc: "Purged resource instance pointer element." });
-                
-                // Refresh finder UI if open
-                renderFinderDirectory('trash');
-
-                if (isDraggingFromDock) {
-                    triggerOSPopup("Trash Can", `Link removed from Dock module.`, "🗑️");
-                    elementToKill.remove();
-                } else {
-                    triggerOSPopup("Trash Can", "Moved item to clean storage grid container inside Finder.", "🗑️");
-                    elementToKill.style.display = "none";
+        document.addEventListener('mouseup', () => {
+            if(isDragging) {
+                isDragging = false;
+                if(document.styleSheets[0].cssRules[0].cssText.includes('user-select')) {
+                    document.styleSheets[0].deleteRule(0);
                 }
             }
-            activelyDraggedElementId = null;
         });
-    }
+    });
+}
 
-    /* --- SYSTEM OPTIONS POPUP CONTEXT MATRIX --- */
-    const workspace = document.getElementById('desktop-bg');
-    const ctxMenu = document.getElementById('desktop-menu');
+// --- 5. APP ROUTERS AND LAUNCH INTERFACES ---
+function setupAppLaunchers() {
+    const launchConfig = [
+        { triggerId: 'shortcut-finder', targetWindowId: 'window-finder' },
+        { triggerId: 'shortcut-terminal', targetWindowId: 'window-terminal' },
+        { triggerId: 'shortcut-games', targetWindowId: 'window-games' },
+        { triggerId: 'shortcut-projects', targetWindowId: 'window-projects' },
+        { triggerId: 'shortcut-settings', targetWindowId: 'window-settings' },
+        { triggerId: 'dock-finder', targetWindowId: 'window-finder' },
+        { triggerId: 'dock-terminal', targetWindowId: 'window-terminal' },
+        { triggerId: 'dock-games', targetWindowId: 'window-games' },
+        { triggerId: 'dock-projects', targetWindowId: 'window-projects' },
+        { triggerId: 'dock-settings', targetWindowId: 'window-settings' }
+    ];
 
-    if (workspace && ctxMenu) {
-        workspace.addEventListener('contextmenu', (e) => {
-            if (e.target.className.includes('desktop-workspace')) {
+    launchConfig.forEach(cfg => {
+        const trigger = document.getElementById(cfg.triggerId);
+        const win = document.getElementById(cfg.targetWindowId);
+        if(trigger && win) {
+            trigger.style.cursor = 'pointer';
+            trigger.addEventListener('click', (e) => {
                 e.preventDefault();
-                ctxMenu.style.left = e.clientX + "px";
-                ctxMenu.style.top = e.clientY + "px";
-                ctxMenu.style.display = "flex";
-            }
-        });
-        document.addEventListener('click', () => { ctxMenu.style.display = "none"; });
-    }
-
-    document.querySelectorAll('.context-item').forEach(menuItem => {
-        menuItem.addEventListener('click', () => {
-            const action = menuItem.getAttribute('data-action');
-            if (action === 'clean-desktop') return;
-
-            let targetId = "";
-            if (action === 'add-finder') targetId = 'shortcut-finder';
-            if (action === 'add-terminal') targetId = 'shortcut-terminal';
-            if (action === 'add-games') targetId = 'shortcut-games';
-            if (action === 'add-settings') targetId = 'shortcut-settings';
-
-            const shortcut = document.getElementById(targetId);
-            if (shortcut) {
-                shortcut.style.display = "flex";
-                triggerOSPopup("Launchpad Core", "Restored component file node framework.", "✨");
-            }
-        });
-    });
-
-    /* --- SECURE SYSTEM SETTINGS PANEL MODULATION --- */
-    document.querySelectorAll('.settings-nav-item').forEach(item => {
-        item.addEventListener('click', () => {
-            document.querySelectorAll('.settings-nav-item').forEach(nav => nav.classList.remove('active'));
-            document.querySelectorAll('.settings-tab-panel').forEach(panel => panel.style.display = 'none');
-            item.classList.add('active');
-            const target = document.getElementById(item.getAttribute('data-tab'));
-            if (target) target.style.display = 'block';
-        });
-    });
-
-    document.querySelectorAll('.wp-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const bg = document.getElementById('desktop-bg');
-            if (!bg) return;
-            bg.classList.remove('bg-space', 'bg-nebula', 'bg-terminal');
-            bg.classList.add(`bg-${btn.getAttribute('data-color')}`);
-        });
-    });
-
-    /* --- HIGHLY PREVENTATIVE SYSTEM ARCADE HOOKS --- */
-    document.querySelectorAll('.arcade-nav-item').forEach(item => {
-        item.addEventListener('click', () => {
-            document.querySelectorAll('.arcade-nav-item').forEach(nav => nav.classList.remove('active'));
-            document.querySelectorAll('.arcade-panel').forEach(panel => panel.style.display = 'none');
-            item.classList.add('active');
-            const targetGame = item.getAttribute('data-game');
-            const targetPanel = document.getElementById(targetGame);
-            if (targetPanel) targetPanel.style.display = 'block';
-            
-            if (targetGame === 'game-dodge') startDodgeGame();
-            else stopDodgeGame();
-        });
-    });
-
-    let crystalsCollected = 0;
-    const asteroidBtn = document.getElementById('asteroid-element');
-    if (asteroidBtn) {
-        asteroidBtn.addEventListener('click', () => {
-            crystalsCollected++;
-            const countDisplay = document.getElementById('crystal-count');
-            if (countDisplay) countDisplay.innerText = crystalsCollected;
-        });
-    }
-
-    let dodgeInterval = null;
-    function startDodgeGame() {
-        stopDodgeGame();
-        let oTop = -30;
-        dodgeInterval = setInterval(() => {
-            oTop += 5;
-            const obstacle = document.getElementById('dodge-obstacle');
-            if (obstacle) obstacle.style.top = oTop + "px";
-            if (oTop > 140) oTop = -30;
-        }, 50);
-    }
-    function stopDodgeGame() { 
-        if (dodgeInterval) clearInterval(dodgeInterval); 
-    }
-
-    /* --- DRAGGABLE WINDOW SYSTEM REGISTER MANAGER --- */
-    function wireMacWindow(triggerId, windowId) {
-        const trigger = document.getElementById(triggerId);
-        const win = document.getElementById(windowId);
-        if (!trigger || !win) return;
-
-        trigger.addEventListener('click', () => {
-            win.style.display = 'flex';
-            bringWindowToFront(win);
-        });
-
-        const closeBtn = win.querySelector('.close-btn');
-        if (closeBtn) {
-            closeBtn.addEventListener('click', () => {
-                win.style.display = 'none';
-                if (windowId === 'window-games') stopDodgeGame();
+                win.style.display = 'flex';
+                win.style.zIndex = '2000';
             });
         }
-        
-        const header = win.querySelector('.window-header');
-        if (header) makeWindowDraggable(header, win);
+    });
+
+    // Finder Viewport Directory Rendering System
+    const sidebarItems = document.querySelectorAll('.finder-sidebar .sidebar-item');
+    sidebarItems.forEach(item => {
+        item.addEventListener('click', () => {
+            sidebarItems.forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
+            renderDirectory(item.getAttribute('data-dir'));
+        });
+    });
+    renderDirectory('desktop');
+}
+
+function renderDirectory(dir) {
+    const viewport = document.getElementById('finder-file-viewport');
+    const pathLabel = document.getElementById('finder-title-path');
+    const headLabel = document.getElementById('finder-current-heading');
+    
+    if(!viewport) return;
+    pathLabel.textContent = `Finder — root/${dir}/`;
+    headLabel.textContent = `${dir.toUpperCase()} Directory Matrix`;
+
+    const fileMap = {
+        desktop: ['🛰️ satellite_comm.log', '📟 terminal_core.sh', '🎮 asteroid_dodge.app'],
+        documents: ['📑 cosmic_mission_plan.txt', '💾 matrix_backup.dat'],
+        downloads: ['📦 node_modules.tar.gz', '📦 css_theme_patch.pkg'],
+        system: ['⚙️ core_telemetry.sys', '🛡️ security_layer.key'],
+        trash: ['🗑️ broken_config.bak', '🗑️ old_workspace_dump.zip']
+    };
+
+    viewport.innerHTML = '';
+    (fileMap[dir] || []).forEach(file => {
+        viewport.insertAdjacentHTML('beforeend', `<div class="file-item">${file}</div>`);
+    });
+}
+
+// --- 6. ENVIRONMENT WALLPAPER INTERFACE MANAGEMENT ---
+function setupWallpaperEngine() {
+    const bg = document.getElementById('desktop-bg');
+    const buttons = document.querySelectorAll('.wp-btn');
+    const tabs = document.querySelectorAll('.settings-sidebar .settings-nav-item');
+
+    buttons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            bg.className = 'desktop-workspace'; 
+            const variant = btn.getAttribute('data-color');
+            bg.classList.add(`bg-${variant}`);
+            showGlobalAlert(`Wallpaper updated to structural variant: [${variant.toUpperCase()}]`);
+        });
+    });
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            tabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            const targetedTab = tab.getAttribute('data-tab');
+            document.querySelectorAll('.settings-tab-panel').forEach(p => p.style.display = 'none');
+            document.getElementById(targetedTab).style.display = 'block';
+        });
+    });
+}
+
+// --- 7. ARCADE SIMULATION CONTROLLER SYSTEMS ---
+function setupArcadeModules() {
+    const asteroid = document.getElementById('asteroid-element');
+    const countDisplay = document.getElementById('crystal-count');
+    const arcadeTabs = document.querySelectorAll('.arcade-sidebar .arcade-nav-item');
+
+    // Clicker logic loop
+    if(asteroid) {
+        asteroid.addEventListener('click', () => {
+            SystemState.energyCrystals++;
+            if(countDisplay) countDisplay.textContent = SystemState.energyCrystals;
+        });
     }
 
-    function bringWindowToFront(target) {
-        document.querySelectorAll('.mac-window').forEach(w => w.style.zIndex = "100");
-        target.style.zIndex = "200";
-    }
+    // Tab Navigation Logic Loop
+    arcadeTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            arcadeTabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            const selectedGame = tab.getAttribute('data-game');
+            document.querySelectorAll('.arcade-panel').forEach(p => p.style.display = 'none');
+            document.getElementById(selectedGame).style.display = 'block';
+        });
+    });
+}
 
-    function makeWindowDraggable(header, targetWin) {
-        let posX = 0, posY = 0, mouseX = 0, mouseY = 0;
-        header.onmousedown = (e) => {
-            if (e.target.className.includes('dot')) return;
-            e.preventDefault(); 
-            mouseX = e.clientX; 
-            mouseY = e.clientY;
-            document.onmouseup = () => { 
-                document.onmouseup = null; 
-                document.onmousemove = null; 
-            };
-            document.onmousemove = (ev) => {
-                ev.preventDefault();
-                posX = mouseX - ev.clientX; 
-                posY = mouseY - ev.clientY;
-                mouseX = ev.clientX; 
-                mouseY = ev.clientY;
-                targetWin.style.top = (targetWin.offsetTop - posY) + "px";
-                targetWin.style.left = (targetWin.offsetLeft - posX) + "px";
-            };
-        };
-    }
+// --- 8. SIMULATED TERMINAL INTERFACE INTERACTIVE SHELL ---
+function setupTerminalConsole() {
+    const input = document.getElementById('terminal-input');
+    const body = document.querySelector('.terminal-body');
 
-    wireMacWindow('shortcut-finder', 'window-finder'); 
-    wireMacWindow('dock-finder', 'window-finder');
-    wireMacWindow('shortcut-terminal', 'window-terminal'); 
-    wireMacWindow('dock-terminal', 'window-terminal');
-    wireMacWindow('shortcut-games', 'window-games'); 
-    wireMacWindow('dock-games', 'window-games');
-    wireMacWindow('shortcut-settings', 'window-settings'); 
-    wireMacWindow('dock-settings', 'window-settings');
+    if(!input) return;
 
-    /* --- RADAR LOOP TIMELINE --- */
-    let radarProgress = 0;
-    setInterval(() => {
-        radarProgress += 0.5; 
-        if (radarProgress > 100) radarProgress = 0;
-        const dot = document.getElementById('satellite-dot');
-        if (dot) {
-            dot.style.left = `${radarProgress}%`;
-            dot.style.top = `${50 + Math.sin(radarProgress * 0.2) * 20}%`;
+    input.addEventListener('keydown', (e) => {
+        if(e.key === 'Enter') {
+            const command = input.value.trim().toLowerCase();
+            input.value = '';
+
+            let responseText = '';
+            if(command === 'help') {
+                responseText = 'Available protocols: clear, telemetry, crystals, unlock-all, matrix-reboot';
+            } else if(command === 'clear') {
+                body.querySelectorAll('p').forEach(p => p.remove());
+                return;
+            } else if(command === 'telemetry') {
+                responseText = `Node Account: ${SystemState.userAccount} | Security Link: 100% Uplink Active.`;
+            } else if(command === 'crystals') {
+                responseText = `Harvested Energy Balance: [${SystemState.energyCrystals}] Cells.`;
+            } else if(command === 'unlock-all') {
+                document.querySelectorAll('.mac-window').forEach(w => w.style.display = 'flex');
+                responseText = 'ALERT: Omnipresent diagnostic layout deployed.';
+            } else if(command === 'matrix-reboot') {
+                responseText = 'WARNING: System execution looping initialized...';
+                setTimeout(() => location.reload(), 1500);
+            } else if(command !== '') {
+                responseText = `sh: command not executed: ${command}. Type 'help'.`;
+            }
+
+            if(responseText) {
+                const line = document.createElement('p');
+                line.className = 'glowing-text';
+                line.style.fontSize = '12px';
+                line.textContent = `> ${responseText}`;
+                body.insertBefore(line, input.parentElement);
+                body.scrollTop = body.scrollHeight;
+            }
         }
-    }, 100);
-});
+    });
+}
+
+// --- 9. POPUP BANNER UTILITY INTERFACES ---
+function showGlobalAlert(message) {
+    const popup = document.getElementById('system-popup');
+    const text = document.getElementById('popup-text');
+    const closeBtn = document.getElementById('close-popup');
+
+    if(!popup || !text) return;
+
+    text.textContent = message;
+    popup.style.display = 'block';
+
+    if(closeBtn) {
+        closeBtn.onclick = () => popup.style.display = 'none';
+    }
+
+    // Auto dismiss after 5000ms
+    setTimeout(() => { popup.style.display = 'none'; }, 5000);
+}
+
+// Mission Log Subsystem Hook Integration
+window.saveDevlog = function() {
+    const logVal = document.getElementById('devlogInput').value;
+    const status = document.getElementById('devlogStatus');
+    if(logVal.trim() !== "") {
+        status.textContent = "Log shipped successfully.";
+        status.style.color = "#00ff66";
+        document.getElementById('devlogInput').value = "";
+        showGlobalAlert("Operational log matrix synchronized.");
+    } else {
+        status.textContent = "Error: Block cannot be shipped empty.";
+        status.style.color = "#ff3366";
+    }
+};
+
+// Injection CSS Shake Protocol Ruleset dynamically
+const cssStyle = document.createElement('style');
+cssStyle.innerHTML = `
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-10px); }
+    40%, 80% { transform: translateX(10px); }
+}
+@keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+}
+`;
+document.head.appendChild(cssStyle);
