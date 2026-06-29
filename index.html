@@ -10,40 +10,48 @@
 
     <div class="mac-menu-bar">
         <div class="menu-left">
-            <span class="menu-item bold" id="menu-logo">🛰️ Core OS</span>
-            <span class="menu-item" id="menu-finder">Finder</span>
-            <span class="menu-item" id="menu-terminal">Terminal</span>
-            <span class="menu-item" id="menu-games">Arcade</span>
+            <span class="menu-item bold">🛰️ Core OS</span>
+            <span class="menu-item">Finder</span>
+            <span class="menu-item">Terminal</span>
+            <span class="menu-item">Arcade</span>
         </div>
         <div class="menu-right">
             <span class="menu-item">📶 100% Uplink</span>
             <span class="menu-item">🔋 98% Field Core</span>
-            <span class="menu-item" id="live-clock">00:00 AM</span>
+            <span class="menu-item" id="live-clock">--:--</span>
         </div>
     </div>
 
-    <div class="desktop-workspace bg-space" id="desktop-bg">
-        
-        <div class="desktop-shortcut" id="shortcut-finder">
-            <div class="icon-wrapper">📁</div>
-            <span>Finder</span>
-        </div>
+    <div class="desktop-workspace">
+        <div class="desktop-shortcut">📁 <span>Finder</span></div>
+        <div class="desktop-shortcut">📟 <span>Terminal</span></div>
+        <div class="desktop-shortcut">🎮 <span>Arcade</span></div>
+        <div class="desktop-shortcut">🚀 <span>Missions</span></div>
+        <div class="desktop-shortcut">⚙️ <span>Settings</span></div>
+    </div>
 
-        <div class="desktop-shortcut" id="shortcut-terminal">
-            <div class="icon-wrapper">📟</div>
-            <span>Terminal</span>
+    <div class="dock-container">
+        <div class="mac-dock">
+            <div class="dock-item">📁</div>
+            <div class="dock-item">📟</div>
+            <div class="dock-item">🎮</div>
+            <div class="dock-item">🚀</div>
+            <div class="dock-item">⚙️</div>
+            <div class="dock-separator"></div>
+            <div class="dock-trash-bin">🗑️</div>
         </div>
+    </div>
 
-        <div class="desktop-shortcut" id="shortcut-games">
-            <div class="icon-wrapper">🎮</div>
-            <span>Arcade</span>
+    <div class="mac-notification" id="system-popup">
+        <div class="notification-header">
+            <span class="notif-title">🛰️ TELEMETRY SYSTEM ALERT</span>
+            <span class="notif-close">✕</span>
         </div>
-
-        <div class="desktop-shortcut" id="shortcut-projects">
-            <div class="icon-wrapper">🚀</div>
-            <span>Missions</span>
+        <div class="notification-body">
+            Welcome to NASA Quantum OS. All systems nominal.
         </div>
+    </div>
 
-        <div class="desktop-shortcut" id="shortcut-settings">
-            <div class="icon-wrapper">
-                
+    <script src="script.js"></script>
+</body>
+</html>
