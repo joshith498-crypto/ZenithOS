@@ -6,24 +6,29 @@
     <title>NASA Quantum OS</title>
 </head>
 <body>
-    <header class="top-bar">
-        <span>🛰️ QUANTUM CONTROL CENTER</span>
-        <span id="live-clock">--:--</span>
-    </header>
+    <div class="mac-menu-bar">
+        <div class="menu-left"><b>🛰️ NASA Quantum OS</b></div>
+        <div class="menu-right" id="live-clock">--:--</div>
+    </div>
 
-    <main class="dashboard-grid">
-        <section class="card weather-card">
-            <h2>🌍 GEO-STATIONARY WEATHER</h2>
-            <button onclick="fetchWeather()">INITIALIZE UPLINK</button>
-            <div id="weather-display" class="large-text">READY FOR DATA...</div>
-        </section>
+    <div class="desktop-workspace">
+        <div class="desktop-shortcut" onclick="openWindow('weather-window')">🌍 Weather App</div>
+        <div class="desktop-shortcut" onclick="openWindow('game-window')">🎮 Node Match</div>
+    </div>
 
-        <section class="card game-card">
-            <h2>🎮 NODE MATCH PROTOCOL</h2>
-            <div id="game-grid"></div>
-            <p>SYSTEM SCORE: <span id="score">0</span></p>
-        </section>
-    </main>
+    <div class="mac-window" id="weather-window" style="display:none; position:absolute; top:50px; left:50px;">
+        <button onclick="closeWindow('weather-window')">✕</button>
+        <h3>GEO-STATIONARY WEATHER</h3>
+        <button onclick="fetchWeather()">INITIALIZE UPLINK</button>
+        <p id="weather-display">READY FOR DATA...</p>
+    </div>
+
+    <div class="mac-window" id="game-window" style="display:none; position:absolute; top:50px; left:250px;">
+        <button onclick="closeWindow('game-window')">✕</button>
+        <h3>NODE MATCH PROTOCOL</h3>
+        <div id="game-grid"></div>
+        <p>SCORE: <span id="score">0</span></p>
+    </div>
 
     <script src="script.js"></script>
 </body>
