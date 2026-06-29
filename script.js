@@ -1,31 +1,30 @@
 // Clock
-setInterval(() => document.getElementById('live-clock').textContent = new Date().toLocaleTimeString(), 1000);
+function updateClock() {
+    const now = new Date();
+    document.getElementById('live-clock').textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+setInterval(updateClock, 1000);
+updateClock();
 
-// Weather API
+// Window Management
+function openWindow(id) {
+    document.getElementById(id).style.display = 'block';
+}
+
+function closeWindow(id) {
+    document.getElementById(id).style.display = 'none';
+}
+
+// Weather App Logic
 async function fetchWeather() {
     const display = document.getElementById('weather-display');
-    display.textContent = "UPLINKING...";
+    display.textContent = "Syncing... (NASA Beacon Active)";
     try {
+        // Using Open-Meteo for Hyderabad
         const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=17.385&longitude=78.4867&current_weather=true');
         const data = await res.json();
-        display.textContent = `${data.current_weather.temperature}°C`;
-    } catch(e) { display.textContent = "UPLINK FAILED"; }
-}
-
-// Memory Game
-let score = 0;
-function initGame() {
-    const grid = document.getElementById('game-grid');
-    grid.innerHTML = '';
-    for(let i=0; i<4; i++) {
-        const btn = document.createElement('button');
-        btn.textContent = "ENCRYPTED";
-        btn.onclick = () => {
-            score += 50;
-            document.getElementById('score').textContent = score;
-            btn.style.background = "#00ff00";
-        };
-        grid.appendChild(btn);
+        display.textContent = `Hyderabad: ${data.current_weather.temperature}°C`;
+    } catch(e) {
+        display.textContent = "Error: Uplink Failed";
     }
 }
-initGame();
