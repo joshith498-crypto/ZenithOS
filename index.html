@@ -8,39 +8,40 @@
 <body class="bg-space">
 
     <div class="mac-menu-bar">
-        <div class="menu-left"><span class="menu-item bold">🛰️ Core OS</span></div>
-        <div class="menu-right"><span class="menu-item" id="live-clock">--:--</span></div>
+        <div class="menu-left">
+            <span class="menu-item bold">🛰️ Core OS</span>
+            <span class="menu-item">Finder</span>
+            <span class="menu-item">Terminal</span>
+        </div>
+        <div class="menu-right">
+            <span class="menu-item" id="live-clock">--:--</span>
+        </div>
     </div>
 
     <div class="desktop-workspace">
-        <div class="desktop-shortcut"><div class="icon-wrapper">📁</div> Finder</div>
-        <div class="desktop-shortcut"><div class="icon-wrapper">📟</div> Terminal</div>
-        <div class="desktop-shortcut"><div class="icon-wrapper">🎮</div> Arcade</div>
-        <div class="desktop-shortcut"><div class="icon-wrapper">🚀</div> Missions</div>
-        <div class="desktop-shortcut"><div class="icon-wrapper">⚙️</div> Settings</div>
+        <div class="desktop-shortcut" onclick="openWindow('finder-window')"><div class="icon-wrapper">📁</div> Finder</div>
         <div class="desktop-shortcut" onclick="openWindow('weather-window')"><div class="icon-wrapper">☁️</div> Weather</div>
+    </div>
+
+    <div class="mac-window" id="finder-window" style="display:none; top:50px; left:50px;">
+        <div class="window-header">
+            <div class="dot close-btn" onclick="closeWindow('finder-window')"></div>
+            <div class="window-title">Finder</div>
+        </div>
+        <div class="window-body" style="padding:10px;">
+            <button onclick="createFile()">+ New File</button>
+            <div id="file-list" style="margin-top:10px; color:white;"></div>
+        </div>
     </div>
 
     <div class="mac-window" id="weather-window" style="display:none; top:100px; left:300px;">
         <div class="window-header">
-            <div class="window-dots"><div class="dot close-btn" onclick="closeWindow('weather-window')"></div></div>
-            <div class="window-title">Weather Uplink</div>
+            <div class="dot close-btn" onclick="closeWindow('weather-window')"></div>
+            <div class="window-title">Weather</div>
         </div>
-        <div class="window-body" style="padding: 20px;">
-            <button onclick="fetchWeather()">SYNC DATA</button>
-            <p id="weather-display" style="margin-top:10px;">READY FOR DATA...</p>
-        </div>
-    </div>
-
-    <div class="dock-container">
-        <div class="mac-dock">
-            <div class="dock-item" data-name="Finder">📁</div>
-            <div class="dock-item" data-name="Terminal">📟</div>
-            <div class="dock-item" data-name="Arcade">🎮</div>
-            <div class="dock-item" data-name="Missions">🚀</div>
-            <div class="dock-item" data-name="Settings">⚙️</div>
-            <div class="dock-separator"></div>
-            <div class="dock-trash-bin">🗑️</div>
+        <div class="window-body" style="padding:20px;">
+            <button onclick="fetchWeather()">Sync Temp</button>
+            <p id="weather-display">Ready...</p>
         </div>
     </div>
 
