@@ -2,46 +2,67 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NASA Quantum OS</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-<body class="bg-space">
+<body>
 
     <div class="mac-menu-bar">
         <div class="menu-left">
-            <span class="menu-item bold">🛰️ Core OS</span>
-            <span class="menu-item">Finder</span>
-            <span class="menu-item">Terminal</span>
+            <span class="menu-item bold" id="menu-logo">🛰️ Core OS</span>
+            <span class="menu-item" onclick="document.getElementById('window-finder').style.display='flex'">Finder</span>
+            <span class="menu-item" onclick="document.getElementById('window-terminal').style.display='flex'">Terminal</span>
+            <span class="menu-item" onclick="document.getElementById('window-games').style.display='flex'">Arcade</span>
         </div>
         <div class="menu-right">
-            <span class="menu-item" id="live-clock">--:--</span>
+            <span class="menu-item">📶 100% Uplink</span>
+            <span class="menu-item">🔋 98% Field Core</span>
+            <span class="menu-item" id="live-clock">00:00 AM</span>
         </div>
     </div>
 
-    <div class="desktop-workspace">
-        <div class="desktop-shortcut" onclick="openWindow('finder-window')"><div class="icon-wrapper">📁</div> Finder</div>
-        <div class="desktop-shortcut" onclick="openWindow('weather-window')"><div class="icon-wrapper">☁️</div> Weather</div>
+    <div class="desktop-workspace bg-space" id="desktop-bg">
+        <div class="desktop-shortcut" id="shortcut-finder" onclick="document.getElementById('window-finder').style.display='flex'">
+            <div class="icon-wrapper">📁</div><span>Finder</span>
+        </div>
+        <div class="desktop-shortcut" id="shortcut-weather" onclick="document.getElementById('window-weather').style.display='flex'">
+            <div class="icon-wrapper">☁️</div><span>Weather</span>
+        </div>
+        <div class="desktop-shortcut" id="shortcut-terminal"><div class="icon-wrapper">📟</div><span>Terminal</span></div>
+        <div class="desktop-shortcut" id="shortcut-games"><div class="icon-wrapper">🎮</div><span>Arcade</span></div>
+        <div class="desktop-shortcut" id="shortcut-projects"><div class="icon-wrapper">🚀</div><span>Missions</span></div>
+        <div class="desktop-shortcut" id="shortcut-settings"><div class="icon-wrapper">⚙️</div><span>Settings</span></div>
     </div>
 
-    <div class="mac-window" id="finder-window" style="display:none; top:50px; left:50px;">
+    <div class="mac-window" id="window-weather" style="display: none; top:100px; left:400px;">
         <div class="window-header">
-            <div class="dot close-btn" onclick="closeWindow('finder-window')"></div>
-            <div class="window-title">Finder</div>
+            <div class="window-dots"><div class="dot close-btn" onclick="this.closest('.mac-window').style.display='none'"></div></div>
+            <div class="window-title">Weather Uplink</div>
         </div>
-        <div class="window-body" style="padding:10px;">
-            <button onclick="createFile()">+ New File</button>
-            <div id="file-list" style="margin-top:10px; color:white;"></div>
+        <div class="window-body" style="padding:20px; text-align:center;">
+            <button onclick="fetchWeather()" style="cursor:pointer;">SYNC DATA</button>
+            <p id="weather-display" style="margin-top:15px; color:#00ff66;">READY FOR UPLINK...</p>
         </div>
     </div>
 
-    <div class="mac-window" id="weather-window" style="display:none; top:100px; left:300px;">
+    <div class="mac-window" id="window-finder" style="display: none;">
         <div class="window-header">
-            <div class="dot close-btn" onclick="closeWindow('weather-window')"></div>
-            <div class="window-title">Weather</div>
+            <div class="window-dots">
+                <div class="dot close-btn" onclick="this.closest('.mac-window').style.display='none'"></div>
+            </div>
+            <div class="window-title" id="finder-title-path">Finder — root/desktop/</div>
         </div>
-        <div class="window-body" style="padding:20px;">
-            <button onclick="fetchWeather()">Sync Temp</button>
-            <p id="weather-display">Ready...</p>
+        <div class="window-body">
+            <div style="padding: 10px;">
+                <button onclick="createFinderFile()" style="cursor:pointer;">+ Create New File</button>
+            </div>
+            <div class="finder-layout">
+                <div class="finder-content">
+                    <h4 id="finder-current-heading">DIRECTORY MATRIX</h4>
+                    <div class="file-grid" id="finder-file-viewport"></div>
+                </div>
+            </div>
         </div>
     </div>
 
