@@ -2,83 +2,43 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NASA Quantum OS</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
     <div class="mac-menu-bar">
         <div class="menu-left">
-            <span class="menu-item bold" id="menu-logo">🛰️ Core OS</span>
-            <span class="menu-item" onclick="document.getElementById('window-finder').style.display='flex'">Finder</span>
-            <span class="menu-item" onclick="document.getElementById('window-terminal').style.display='flex'">Terminal</span>
-            <span class="menu-item" onclick="document.getElementById('window-games').style.display='flex'">Arcade</span>
+            <span class="menu-item bold">🛰️ Core OS</span>
         </div>
         <div class="menu-right">
-            <span class="menu-item">📶 100% Uplink</span>
-            <span class="menu-item">🔋 98% Field Core</span>
             <span class="menu-item" id="live-clock">00:00 AM</span>
         </div>
     </div>
 
     <div class="desktop-workspace bg-space" id="desktop-bg">
-        <div class="desktop-shortcut" id="shortcut-finder" onclick="document.getElementById('window-finder').style.display='flex'">
-            <div class="icon-wrapper">📁</div><span>Finder</span>
-        </div>
-        <div class="desktop-shortcut" id="shortcut-weather" onclick="document.getElementById('window-weather').style.display='flex'">
-            <div class="icon-wrapper">☁️</div><span>Weather</span>
-        </div>
-        <div class="desktop-shortcut" id="shortcut-terminal"><div class="icon-wrapper">📟</div><span>Terminal</span></div>
-        <div class="desktop-shortcut" id="shortcut-games"><div class="icon-wrapper">🎮</div><span>Arcade</span></div>
-        <div class="desktop-shortcut" id="shortcut-projects"><div class="icon-wrapper">🚀</div><span>Missions</span></div>
-        <div class="desktop-shortcut" id="shortcut-settings"><div class="icon-wrapper">⚙️</div><span>Settings</span></div>
+        <div class="desktop-shortcut" id="shortcut-finder"><div class="icon-wrapper">📁</div><span>Finder</span></div>
+        <div class="desktop-shortcut" id="shortcut-weather" onclick="document.getElementById('window-weather').style.display='flex'"><div class="icon-wrapper">☁️</div><span>Weather</span></div>
     </div>
 
     <div class="mac-window" id="window-weather" style="display: none;">
-        <div class="window-header">
-            <div class="window-dots"><div class="dot close-btn" onclick="this.closest('.mac-window').style.display='none'"></div></div>
-            <div class="window-title">Weather Uplink</div>
-        </div>
+        <div class="window-header"><div class="dot close-btn" onclick="this.closest('.mac-window').style.display='none'"></div><div class="window-title">Weather</div></div>
         <div class="window-body" style="padding:20px; text-align:center;">
-            <button onclick="fetchWeather()" style="cursor:pointer; background:rgba(0,255,102,0.2); border:1px solid #00ff66; color:white; padding:8px;">SYNC DATA</button>
-            <p id="weather-display" style="margin-top:15px; color:#00ff66;">READY FOR UPLINK...</p>
+            <button onclick="fetchWeather()">SYNC DATA</button>
+            <p id="weather-display">Ready...</p>
         </div>
     </div>
 
     <div class="mac-window" id="window-finder" style="display: none;">
-        <div class="window-header">
-            <div class="window-dots"><div class="dot close-btn" onclick="this.closest('.mac-window').style.display='none'"></div></div>
-            <div class="window-title" id="finder-title-path">Finder — root/desktop/</div>
-        </div>
+        <div class="window-header"><div class="dot close-btn" onclick="this.closest('.mac-window').style.display='none'"></div><div class="window-title">Finder</div></div>
         <div class="window-body">
-            <div style="padding: 10px;">
-                <button onclick="createFinderFile()" style="cursor:pointer;">+ Create New File</button>
-            </div>
-            <div class="finder-layout">
-                <div class="finder-sidebar">
-                    <div class="sidebar-item active" data-dir="desktop">🌌 Desktop</div>
-                    <div class="sidebar-item" data-dir="documents">💾 Docs</div>
-                    <div class="sidebar-item" data-dir="downloads">📦 Packages</div>
-                    <div class="sidebar-item" data-dir="system">⚙️ System</div>
-                </div>
-                <div class="finder-content">
-                    <h4 id="finder-current-heading" style="margin:0; font-weight:500;">DESKTOP Directory Matrix</h4>
-                    <div class="file-grid" id="finder-file-viewport"></div>
-                </div>
-            </div>
+            <button onclick="createFinderFile()">+ New File</button>
+            <div class="file-grid" id="finder-file-viewport"></div>
         </div>
     </div>
 
     <div class="dock-container">
         <div class="mac-dock">
             <div class="dock-item" id="dock-finder" data-name="Finder">📁</div>
-            <div class="dock-item" id="dock-terminal" data-name="Terminal">📟</div>
-            <div class="dock-item" id="dock-games" data-name="Arcade">🎮</div>
-            <div class="dock-item" id="dock-projects" data-name="Missions">🚀</div>
-            <div class="dock-item" id="dock-settings" data-name="Settings">⚙️</div>
-            <div class="dock-separator"></div>
-            <div class="dock-trash-bin" id="dock-trash" data-name="Trash Can">🗑️</div>
         </div>
     </div>
 
