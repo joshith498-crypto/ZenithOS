@@ -1,6 +1,6 @@
-# 🚀 NASA Mission Control OS v2.0 🛰️
+# 🚀ZenithOS🛰️
 
-Welcome to the **NASA Mission Control OS**, an interactive, retro-themed cockpit dashboard built entirely from scratch using HTML, CSS, and vanilla JavaScript. Experience an 80s CRT terminal environment loaded with diagnostic tools and fully functional embedded mini-games!
+Welcome to the **ZenithOS**, an interactive, retro-themed cockpit dashboard built entirely from scratch using HTML, CSS, and vanilla JavaScript. Experience an 80s CRT terminal environment loaded with diagnostic tools and fully functional embedded mini-games!
 
 ---
 
