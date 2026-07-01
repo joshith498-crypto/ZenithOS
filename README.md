@@ -9,7 +9,7 @@ Welcome to the **ZenithOS**, an interactive, retro-themed cockpit dashboard buil
 You can run this operating system directly in your web browser without downloading or installing anything!
 
 1. Click the live website link below :
-   👉 ** https://joshith498-crypto.github.io/nasa-mission-control-os/**
+   👉 ** https://joshith498-crypto.github.io/ZenithOS/**
 2. The system will boot up automatically. 
 3. Double-click any of the desktop shortcuts (like **Core Terminal** or **Alien Blaster**) to open the applications!
 
