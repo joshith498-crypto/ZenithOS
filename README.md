@@ -4,7 +4,7 @@ ZenithOS is a browser-based desktop environment that I built using HTML, CSS and
 
 Live Demo:
 
-https://joshith498-crypto.github.io/ZenithOS/
+https://joshith498-crypto.github.io/ZenithOS/ Important Note The live Demo Isn't Working So who ever wants to try the web os please download the zip and open index.html in your browsers
 
 Features:
 
