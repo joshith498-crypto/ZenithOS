@@ -148,7 +148,7 @@ function setupMinesweeper() {
     const bestEl = document.getElementById('mines-best');
     const restartBtn = document.getElementById('mines-restart');
 
-    const bestKey = 'qos_mines_best';
+    const bestKey = 'zenith_mines_best';
     const renderBest = () => {
         const best = localStorage.getItem(bestKey);
         if (bestEl) bestEl.textContent = best ? `${best}s` : '—';
@@ -218,6 +218,7 @@ function setupMinesweeper() {
         }
         render();
     }
+
 
     function toggleFlag(idx) {
         if (gameOver || cells[idx].revealed) return;
