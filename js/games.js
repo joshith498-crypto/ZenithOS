@@ -1,4 +1,4 @@
-// QuantumOS - Integrated Games (Snake, Minesweeper, Memory)
+// ZenithOS - Integrated Games (Snake, Minesweeper, Memory)
 
 function setupArcadeModules() {
     const asteroid = document.getElementById('asteroid-element');
@@ -10,7 +10,7 @@ function setupArcadeModules() {
     if (asteroid) {
         asteroid.addEventListener('click', () => {
             SystemState.energyCrystals++;
-            localStorage.setItem('zenith_crystals', SystemState.energyCrystals);
+            localStorage.setItem('qos_crystals', SystemState.energyCrystals);
             if (countDisplay) countDisplay.textContent = SystemState.energyCrystals;
         });
     }
@@ -22,13 +22,7 @@ function setupArcadeModules() {
             const selectedGame = tab.getAttribute('data-game');
             document.querySelectorAll('.arcade-panel').forEach(p => p.style.display = 'none');
             const targetPanel = document.getElementById(selectedGame);
-            if (targetPanel) {
-                targetPanel.style.display = 'block';
-                // Re-init games when their panel is opened to ensure they are fresh
-                if (selectedGame === 'game-mines') setupMinesweeper();
-                if (selectedGame === 'game-memory') setupMemoryGame();
-                if (selectedGame === 'game-snake') setupSnakeGame();
-            }
+            if (targetPanel) targetPanel.style.display = 'block';
         });
     });
 }
@@ -38,16 +32,16 @@ function setupSnakeGame() {
     const canvas = document.getElementById('snake-canvas');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    const cell = 16;
+    const cell = 18;
     const cols = canvas.width / cell;
     const rows = canvas.height / cell;
-
+//made few changes to snake game though they are minor 
     let snake, dir, nextDir, food, score, alive, loopHandle;
     const scoreEl = document.getElementById('snake-score');
     const bestEl = document.getElementById('snake-best');
     const restartBtn = document.getElementById('snake-restart');
 
-    const getBest = () => parseInt(localStorage.getItem('zenith_snake_best')) || 0;
+    const getBest = () => parseInt(localStorage.getItem('qos_snake_best')) || 0;
     if (bestEl) bestEl.textContent = getBest();
 
     function randomFood() {
@@ -78,7 +72,7 @@ function setupSnakeGame() {
             alive = false;
             const best = getBest();
             if (score > best) {
-                localStorage.setItem('zenith_snake_best', score);
+                localStorage.setItem('qos_snake_best', score);
                 if (bestEl) bestEl.textContent = score;
                 showGlobalAlert(`New Comet Snake high score: ${score}!`);
             }
@@ -225,6 +219,7 @@ function setupMinesweeper() {
         render();
     }
 
+
     function toggleFlag(idx) {
         if (gameOver || cells[idx].revealed) return;
         cells[idx].flagged = !cells[idx].flagged;
@@ -263,7 +258,7 @@ function setupMemoryGame() {
     const movesEl = document.getElementById('memory-moves');
     const bestEl = document.getElementById('memory-best');
     const restartBtn = document.getElementById('memory-restart');
-    const bestKey = 'zenith_memory_best';
+    const bestKey = 'qos_memory_best';
 
     let deck, flipped, matchedCount, moves, lock;
 
