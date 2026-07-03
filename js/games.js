@@ -32,7 +32,7 @@ function setupSnakeGame() {
     const canvas = document.getElementById('snake-canvas');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    const cell = 18;
+    const cell = 16;
     const cols = canvas.width / cell;
     const rows = canvas.height / cell;
 //made few changes to snake game though they are minor 
