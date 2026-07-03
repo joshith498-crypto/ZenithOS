@@ -1,4 +1,4 @@
-// QuantumOS - Window Management System
+// ZenithOS - Window Management System
 
 function setupWindowControls() {
     const windows = document.querySelectorAll('.mac-window');
@@ -92,20 +92,17 @@ function setupAppLaunchers() {
         { triggerId: 'shortcut-finder', targetWindowId: 'window-finder' },
         { triggerId: 'shortcut-terminal', targetWindowId: 'window-terminal' },
         { triggerId: 'shortcut-games', targetWindowId: 'window-games' },
-       { triggerId: 'shortcut-missions', targetWindowId: 'window-mission-control' },// Fixed ID mismatch
         { triggerId: 'shortcut-settings', targetWindowId: 'window-settings' },
-        { triggerId: 'shortcut-mc', targetWindowId: 'window-mission-control' },
         { triggerId: 'shortcut-notes', targetWindowId: 'window-notes' },
         { triggerId: 'shortcut-calc', targetWindowId: 'window-calculator' },
         { triggerId: 'dock-finder', targetWindowId: 'window-finder' },
         { triggerId: 'dock-terminal', targetWindowId: 'window-terminal' },
         { triggerId: 'dock-games', targetWindowId: 'window-games' },
-{ triggerId: 'dock-projects', targetWindowId: 'window-mission-control' },
-{ triggerId: 'dock-mc', targetWindowId: 'window-mission-control' },
-{ triggerId: 'dock-settings', targetWindowId: 'window-settings' },
+        { triggerId: 'dock-settings', targetWindowId: 'window-settings' },
         { triggerId: 'dock-notes', targetWindowId: 'window-notes' },
         { triggerId: 'dock-calc', targetWindowId: 'window-calculator' }
     ];
+
     launchConfig.forEach(cfg => {
         const el = document.getElementById(cfg.triggerId);
         if (el) {
