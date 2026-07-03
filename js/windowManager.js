@@ -93,12 +93,14 @@ function setupAppLaunchers() {
         { triggerId: 'shortcut-terminal', targetWindowId: 'window-terminal' },
         { triggerId: 'shortcut-games', targetWindowId: 'window-games' },
         { triggerId: 'shortcut-settings', targetWindowId: 'window-settings' },
+        { triggerId: 'shortcut-mc', targetWindowId: 'window-mission-control' },
         { triggerId: 'shortcut-notes', targetWindowId: 'window-notes' },
         { triggerId: 'shortcut-calc', targetWindowId: 'window-calculator' },
         { triggerId: 'dock-finder', targetWindowId: 'window-finder' },
         { triggerId: 'dock-terminal', targetWindowId: 'window-terminal' },
         { triggerId: 'dock-games', targetWindowId: 'window-games' },
         { triggerId: 'dock-settings', targetWindowId: 'window-settings' },
+        { triggerId: 'dock-mc', targetWindowId: 'window-mission-control' },
         { triggerId: 'dock-notes', targetWindowId: 'window-notes' },
         { triggerId: 'dock-calc', targetWindowId: 'window-calculator' }
     ];
