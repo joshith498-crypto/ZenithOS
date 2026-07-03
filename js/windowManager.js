@@ -100,7 +100,7 @@ function setupAppLaunchers() {
         { triggerId: 'dock-finder', targetWindowId: 'window-finder' },
         { triggerId: 'dock-terminal', targetWindowId: 'window-terminal' },
         { triggerId: 'dock-games', targetWindowId: 'window-games' },
-     { triggerId: 'dock-projects', targetWindowId: 'window-mission-control' },
+{ triggerId: 'dock-mc', targetWindowId: 'window-mission-control' },
         { triggerId: 'dock-settings', targetWindowId: 'window-settings' },
         { triggerId: 'dock-mc', targetWindowId: 'window-mission-control' },
         { triggerId: 'dock-notes', targetWindowId: 'window-notes' },
