@@ -1,27 +1,37 @@
-ZenithOS:
+# ZenithOS
 
-ZenithOS is a browser-based desktop environment that I built using HTML, CSS and vanilla JavaScript. I wanted to make a website that feels like a small operating system, so I added draggable windows, a macOS-style dock, a terminal, settings, and a few mini games.
+ZenithOS is a browser-based desktop environment made using HTML, CSS and JavaScript. The idea was to create a simple operating system interface that feels similar to a real desktop while running completely in the browser.
 
-Live Demo:
+Live Demo
 https://zenithos1.netlify.app/
-Features:
 
-- Draggable windows
-- Finder
-- Terminal
-- macOS-style dock
-- Settings
-- Mini games
+Features
+- Desktop with draggable windows
+- Finder-style file manager
+- Terminal with basic commands
+- Calculator
+- Notes app
+- Settings window
+- Mission Control
+- Arcade games including Snake and Alien Blaster
+- Boot screen and login screen
+How to Run
+Online
+Open the live demo using the link above.
+Locally
+1. Download the project.
+2. Keep all the files in the same folder.
+3. Open `index.html` in any modern web browser.
 
-Running the Project:
-
-Open the live demo above, or download the project and open `index.html` in your browser.
-
-Built With:
-
+No installation is required.
+Terminal Commands
+- `help` - Shows all available commands
+- `status` - Displays system status
+- `rover` - Shows rover information
+- `clear` - Clears the terminal
+Technologies Used
 - HTML
 - CSS
 - JavaScript
-
-Notes:
-This project helped me practice working with JavaScript events, window management, and building a more interactive interface than a regular website. I'll continue improving it by adding more apps and features.
+ About
+This project was built as a learning project to practice JavaScript, window management, and creating a desktop-like interface in the browser. While working on it, I learned more about DOM manipulation, event handling, animations, and organizing a larger front-end project.
