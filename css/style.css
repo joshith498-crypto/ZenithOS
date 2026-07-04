@@ -119,11 +119,13 @@ body {
     height: 390px;
     top: 15%;
     left: 25%;
-    background: var(--qos-bg-panel);
-    backdrop-filter: blur(30px);
-    border: 1px solid var(--qos-border);
-    border-radius: 12px;
-    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.8);
+    background: rgba(12, 16, 28, 0.88);
+    backdrop-filter: blur(18px);
+    border: 2px solid rgba(124, 58, 237, 0.45);
+    border-radius: 18px;
+    box-shadow:
+        0 0 25px rgba(124,58,237,.25),
+        0 25px 60px rgba(0,0,0,.65);
     display: flex;
     flex-direction: column;
     overflow: hidden;
