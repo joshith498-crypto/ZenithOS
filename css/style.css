@@ -151,7 +151,7 @@ body {
 
 .window-header {
     height: 36px;
-    background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.015));
+  background: linear-gradient(90deg,#1f1147,#2d1b69,#1f1147);
     display: flex;
     align-items: center;
     padding: 0 14px;
