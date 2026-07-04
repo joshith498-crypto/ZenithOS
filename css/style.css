@@ -42,17 +42,7 @@ body {
 }
 
 .bg-space {
-    background-image: url("assets/wallpapers/nebula.jpg");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-}
-
-.bg-nebula {
-    background-image: url("assets/wallpapers/grid.jpg");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+    background: red !important;
 }
 
 .bg-terminal {
