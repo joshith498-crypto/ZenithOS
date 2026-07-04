@@ -346,3 +346,93 @@ body {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(0, 255, 102, 0.3); }
+
+/* ==========================
+   Zenith Assistant
+========================== */
+
+#zenith-assistant-btn{
+    position:fixed;
+    right:24px;
+    bottom:105px;
+    width:58px;
+    height:58px;
+    border-radius:50%;
+    background:linear-gradient(135deg,#7c3aed,#5b21b6);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:28px;
+    cursor:pointer;
+    box-shadow:0 0 20px rgba(124,58,237,.6);
+    transition:.25s;
+    z-index:99999;
+}
+
+#zenith-assistant-btn:hover{
+    transform:scale(1.1);
+    box-shadow:0 0 35px rgba(124,58,237,.9);
+}
+
+#zenith-assistant-panel{
+    position:fixed;
+    right:24px;
+    bottom:175px;
+    width:320px;
+    background:rgba(15,18,30,.96);
+    border:1px solid rgba(124,58,237,.5);
+    border-radius:18px;
+    backdrop-filter:blur(18px);
+    box-shadow:0 15px 45px rgba(0,0,0,.45);
+    z-index:99999;
+    overflow:hidden;
+}
+
+.assistant-hidden{
+    display:none;
+}
+
+.assistant-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:14px 18px;
+    background:linear-gradient(90deg,#5b21b6,#7c3aed);
+    color:white;
+}
+
+.assistant-header h3{
+    margin:0;
+    font-size:16px;
+}
+
+#assistant-close{
+    cursor:pointer;
+    font-size:18px;
+}
+
+.assistant-content{
+    padding:16px;
+}
+
+.assistant-content button{
+    width:100%;
+    margin-top:10px;
+    padding:10px;
+    border:none;
+    border-radius:10px;
+    background:#24273a;
+    color:white;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.assistant-content button:hover{
+    background:#7c3aed;
+}
+
+.assistant-content hr{
+    margin:16px 0;
+    border:0;
+    border-top:1px solid rgba(255,255,255,.12);
+}
