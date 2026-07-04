@@ -25,9 +25,11 @@ body {
 
 /* --- WORKSPACE --- */
 .desktop-workspace {
-    position: absolute;
+    position: fixed;
     top: 26px;
-    bottom: 105px;
+    left: 0;
+    right: 0;
+    bottom: 80px;
     width: 100%;
     padding: 24px;
     display: flex;
@@ -39,16 +41,32 @@ body {
     transition: background 0.5s ease;
 }
 
-.bg-space { background: radial-gradient(circle, #1a1c2c 0%, #0d0e15 100%); }
-.bg-nebula { background: radial-gradient(circle, #44337a 0%, #1a1c2c 100%); }
-.bg-terminal { background: linear-gradient(180deg, #020d04 0%, #000000 100%); }
+.bg-space {
+    background-image: url("assets/wallpapers/nebula.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.bg-nebula {
+    background-image: url("assets/wallpapers/grid.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.bg-terminal {
+    background-image: url("assets/wallpapers/planet.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
 
 /* --- MENU BAR --- */
 .mac-menu-bar {
     width: 100%;
     height: 26px;
     background: rgba(12, 14, 22, 0.88);
-    backdrop-filter: blur(12px);
     border-bottom: 1px solid rgba(183, 148, 244, 0.2);
     position: fixed;
     top: 0;
@@ -330,55 +348,3 @@ body {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(0, 255, 102, 0.3); }
-
-/* --- GAME SPECIFIC STYLES --- */
-.mine-cell {
-    width: 25px;
-    height: 25px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    cursor: pointer;
-    border-radius: 3px;
-}
-
-.mine-cell.revealed {
-    background: rgba(0, 0, 0, 0.3);
-    border-color: rgba(255, 255, 255, 0.05);
-}
-
-.mine-cell.mine-hit {
-    background: rgba(255, 95, 86, 0.3);
-    border-color: #ff5f56;
-}
-
-.mine-cell[data-n="1"] { color: #5ec8ff; }
-.mine-cell[data-n="2"] { color: #00ff66; }
-.mine-cell[data-n="3"] { color: #ff5f56; }
-
-.memory-card {
-    width: 50px;
-    height: 50px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-    cursor: pointer;
-    border-radius: 6px;
-    transition: all 0.2s;
-}
-
-.memory-card.flipped {
-    background: rgba(183, 148, 244, 0.2);
-    border-color: var(--qos-accent);
-}
-
-.memory-card.matched {
-    opacity: 0.4;
-    cursor: default;
-}
