@@ -188,7 +188,6 @@
                 <div class="arcade-sidebar">
                     <div class="arcade-nav-item active" data-game="game-clicker">☄️ Clicker</div>
                     <div class="arcade-nav-item" data-game="game-snake">🐍 Comet Snake</div>
-                    <div class="arcade-nav-item" data-game="game-mines">💣 Minefield</div>
                     <div class="arcade-nav-item" data-game="game-memory">🧠 Signal Match</div>
                 </div>
                 <div class="arcade-content">
@@ -201,11 +200,6 @@
                         <canvas id="snake-canvas" width="320" height="240" style="background: #000; border: 1px solid #333;"></canvas>
                         <div style="margin-top: 10px; font-size: 14px;">Score: <span id="snake-score">0</span> | Best: <span id="snake-best">0</span></div>
                         <button id="snake-restart" style="margin-top: 8px; padding: 4px 12px; background: #b794f4; border: none; border-radius: 4px; cursor: pointer;">Restart</button>
-                    </div>
-                    <div class="arcade-panel" id="game-mines" style="display: none;">
-                        <div id="mines-grid" style="display: grid; grid-template-columns: repeat(9, 25px); gap: 2px; justify-content: center; margin-bottom: 10px;"></div>
-                        <div style="font-size: 14px;">Status: <span id="mines-status">Ready</span> | Best: <span id="mines-best">—</span></div>
-                        <button id="mines-restart" style="margin-top: 8px; padding: 4px 12px; background: #b794f4; border: none; border-radius: 4px; cursor: pointer;">New Game</button>
                     </div>
                     <div class="arcade-panel" id="game-memory" style="display: none;">
                         <div id="memory-grid" style="display: grid; grid-template-columns: repeat(4, 50px); gap: 8px; justify-content: center; margin-bottom: 10px;"></div>
