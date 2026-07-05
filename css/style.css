@@ -40,23 +40,18 @@ body {
     z-index: 10;
     transition: background 0.5s ease;
 }
-.bg-space {
-    background-image: url("../assets/wallpapers/nebula.jpg");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+.bg-planet{
+    background-image:url("../assets/wallpapers/planet.jpg");
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
 }
-.bg-nebula {
-    background-image: url("../assets/wallpapers/planet.jpg");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-}
-.bg-terminal {
-    background-image: url("../assets/wallpapers/nebula.jpg");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+
+.bg-nebula{
+    background-image:url("../assets/wallpapers/nebula.jpg");
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
 }
 /* --- MENU BAR --- */
 .mac-menu-bar{
