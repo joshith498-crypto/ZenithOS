@@ -96,3 +96,28 @@ function runBootSequence() {
     };
     step();
 }
+function createStarfield(){
+
+    const field=document.getElementById("starfield");
+
+    if(!field) return;
+
+    for(let i=0;i<80;i++){
+
+        const star=document.createElement("div");
+
+        star.className="star";
+
+        star.style.left=Math.random()*100+"%";
+
+        star.style.top=Math.random()*100+"%";
+
+        star.style.animationDelay=(Math.random()*5)+"s";
+
+        field.appendChild(star);
+
+    }
+
+}
+
+createStarfield();
