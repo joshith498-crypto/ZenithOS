@@ -3,9 +3,9 @@
 ZenithOS is a browser-based desktop environment made using HTML, CSS and JavaScript. The idea was to create a simple operating system interface that feels similar to a real desktop while running completely in the browser.
 About
 I Made this project so that i can learn more about coding and i insiped from my friend who created a good web based os 
-Live Demo
-https://zenithos1.netlify.app/
 
+Live Demo
+zenith-r9odd1569-joshith498-cryptos-projects.vercel.app
 Features
 - Desktop with draggable windows
 - Finder-style file manager
