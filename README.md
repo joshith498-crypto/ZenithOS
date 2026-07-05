@@ -7,6 +7,7 @@ I Made this project so that i can learn more about coding and i insiped from my 
 Live Demo
 
 [zenith-r9odd1569-joshith498-cryptos-projects.vercel.app](https://zenith-r9odd1569-joshith498-cryptos-projects.vercel.app/)
+
 Features
 - Desktop with draggable windows
 - Finder-style file manager
