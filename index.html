@@ -47,15 +47,29 @@
 
     <!-- Menu Bar -->
     <div class="mac-menu-bar">
-        <div class="menu-left">
-            <span class="menu-item bold" id="menu-logo">🌌 Zenith OS</span>
-            <span class="menu-item" onclick="openWindow('window-finder')">Finder</span>
-            <span class="menu-item" onclick="openWindow('window-terminal')">Terminal</span>
-            <span class="menu-item" onclick="openWindow('window-games')">Arcade</span>
-            <span class="menu-item" onclick="openWindow('window-mission-control')">Mission Control</span>
-            <span class="menu-item" onclick="openWindow('window-notes')">Notes</span>
-            <span class="menu-item" onclick="openWindow('window-calculator')">Calculator</span>
-        </div>
+      <div class="menu-left">
+    <span class="menu-item bold" id="menu-logo">◈ ZENITH CORE</span>
+
+    <span class="menu-item" onclick="openWindow('window-finder')">
+        Workspace
+    </span>
+
+    <span class="menu-item" onclick="openWindow('window-terminal')">
+        Console
+    </span>
+
+    <span class="menu-item" onclick="openWindow('window-games')">
+        Arcade
+    </span>
+
+    <span class="menu-item" onclick="openWindow('window-notes')">
+        Notes
+    </span>
+
+    <span class="menu-item" onclick="openWindow('window-calculator')">
+        Tools
+    </span>
+</div>
         <div class="menu-right">
             <span class="menu-item" id="cc-toggle">🎛️</span>
             <span class="menu-item">📶 100% Uplink</span>
@@ -169,6 +183,211 @@
         </div>
         <div class="window-body terminal-body">
             <p class="glowing-text">> NASA OMNI INTERFACE LOADING...</p>
+            <p class="glowing-text">> LINK ESTABLISHED SECURELY.</p>
+            <div class="terminal-input-line">
+                <span style="color: #b794f4;">nasa-os:~ core$</span>
+                <input type="text" id="terminal-input" autofocus autocomplete="off">
+            </div>
+        </div>
+    </div>
+
+    <!-- Arcade Window -->
+    <div class="mac-window" id="window-games" style="display: none;">
+        <div class="window-header">
+            <div class="window-dots"><div class="dot close-btn"></div><div class="dot min-btn"></div><div class="dot max-btn"></div></div>
+            <div class="window-title">Arcade Center</div>
+        </div>
+        <div class="window-body">
+            <div class="arcade-layout">
+                <div class="arcade-sidebar">
+                    <div class="arcade-nav-item active" data-game="game-clicker">☄️ Clicker</div>
+                    <div class="arcade-nav-item" data-game="game-snake">🐍 Comet Snake</div>
+                    <div class="arcade-nav-item" data-game="game-memory">🧠 Signal Match</div>
+                </div>
+                <div class="arcade-content">
+                    <div class="arcade-panel" id="game-clicker">
+                        <p style="font-size: 13px; color: #94a3b8;">Harvest space elements to generate energy cells.</p>
+                        <div id="asteroid-element" style="font-size: 64px; cursor: pointer; margin: 20px 0;">☄️</div>
+                        <div class="arcade-score">Energy Crystals: <span id="crystal-count">0</span></div>
+                    </div>
+                    <div class="arcade-panel" id="game-snake" style="display: none;">
+                        <canvas id="snake-canvas" width="320" height="240" style="background: #000; border: 1px solid #333;"></canvas>
+                        <div style="margin-top: 10px; font-size: 14px;">Score: <span id="snake-score">0</span> | Best: <span id="snake-best">0</span></div>
+                        <button id="snake-restart" style="margin-top: 8px; padding: 4px 12px; background: #b794f4; border: none; border-radius: 4px; cursor: pointer;">Restart</button>
+                    </div>
+                    <div class="arcade-panel" id="game-memory" style="display: none;">
+                        <div id="memory-grid" style="display: grid; grid-template-columns: repeat(4, 50px); gap: 8px; justify-content: center; margin-bottom: 10px;"></div>
+                        <div style="font-size: 14px;">Moves: <span id="memory-moves">0</span> | Best: <span id="memory-best">—</span></div>
+                        <button id="memory-restart" style="margin-top: 8px; padding: 4px 12px; background: #b794f4; border: none; border-radius: 4px; cursor: pointer;">Reset</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mission Control Window -->
+    <div class="mac-window" id="window-mission-control" style="display: none;">
+        <div class="window-header">
+            <div class="window-dots"><div class="dot close-btn"></div><div class="dot min-btn"></div><div class="dot max-btn"></div></div>
+            <div class="window-title">Mission Control</div>
+        </div>
+        <div class="window-body" style="padding: 16px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px;">
+                    <h4 style="color: #b794f4; margin-bottom: 8px;">CPU Load</h4>
+                    <canvas id="mc-cpu-canvas" width="200" height="80"></canvas>
+                </div>
+                <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px;">
+                    <h4 style="color: #f687b3; margin-bottom: 8px;">Memory Usage</h4>
+                    <canvas id="mc-ram-canvas" width="200" height="80"></canvas>
+                </div>
+            </div>
+            <div style="margin-top: 16px; background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px;">
+                <h4 style="margin-bottom: 8px;">System Status</h4>
+                <div style="font-size: 13px; color: #94a3b8;">
+                    <div>Uptime: <span id="mc-uptime">00:00:00</span></div>
+                    <div>Active Modules: <span id="mc-active-windows">0</span></div>
+                    <div id="mc-window-list" style="margin-top: 8px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 4px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notes Window -->
+    <div class="mac-window" id="window-notes" style="display: none;">
+        <div class="window-header">
+            <div class="window-dots"><div class="dot close-btn"></div><div class="dot min-btn"></div><div class="dot max-btn"></div></div>
+            <div class="window-title">Notes</div>
+        </div>
+        <div class="window-body">
+            <textarea id="notes-area" style="width: 100%; height: 100%; background: transparent; border: none; color: white; padding: 16px; font-family: inherit; resize: none; outline: none;"></textarea>
+        </div>
+    </div>
+
+    <!-- Calculator Window -->
+    <div class="mac-window" id="window-calculator" style="display: none; width: 240px; height: 320px;">
+        <div class="window-header">
+            <div class="window-dots"><div class="dot close-btn"></div><div class="dot min-btn"></div><div class="dot max-btn"></div></div>
+            <div class="window-title">Calculator</div>
+        </div>
+        <div class="window-body" style="padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+            <div id="calc-display" style="background: #000; padding: 12px; text-align: right; font-size: 24px; border-radius: 6px; color: #b794f4; font-family: monospace;">0</div>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;">
+                <button class="calc-btn calc-op">C</button><button class="calc-btn calc-op">÷</button><button class="calc-btn calc-op">×</button><button class="calc-btn calc-op">-</button>
+                <button class="calc-btn">7</button><button class="calc-btn">8</button><button class="calc-btn">9</button><button class="calc-btn calc-op">+</button>
+                <button class="calc-btn">4</button><button class="calc-btn">5</button><button class="calc-btn">6</button><button class="calc-btn calc-op">=</button>
+                <button class="calc-btn">1</button><button class="calc-btn">2</button><button class="calc-btn">3</button><button class="calc-btn">0</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Window -->
+    <div class="mac-window" id="window-settings" style="display: none;">
+        <div class="window-header">
+            <div class="window-dots"><div class="dot close-btn"></div><div class="dot min-btn"></div><div class="dot max-btn"></div></div>
+            <div class="window-title">Settings</div>
+        </div>
+        <div class="window-body">
+            <div class="settings-layout">
+                <div class="settings-sidebar">
+                    <div class="settings-nav-item active" data-tab="tab-display">🖥️ Display</div>
+                    <div class="settings-nav-item" data-tab="tab-wallpaper">🌌 Wallpaper</div>
+                    <div class="settings-nav-item" data-tab="tab-general">⚙️ General</div>
+                </div>
+                <div class="settings-content">
+                    <div class="settings-tab-panel" id="tab-display">
+                        <div style="margin-bottom: 16px;">
+                            <label style="display: block; font-size: 13px; margin-bottom: 4px;">Brightness</label>
+                            <input type="range" id="set-brightness" min="40" max="120" value="100" style="width: 100%;">
+                        </div>
+                        <div style="margin-bottom: 16px;">
+                            <label style="display: block; font-size: 13px; margin-bottom: 4px;">Glass Blur</label>
+                            <input type="range" id="set-blur" min="0" max="40" value="30" style="width: 100%;">
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <label style="font-size: 13px;">Reduce Motion</label>
+                            <input type="checkbox" id="set-reduce-motion">
+                        </div>
+                    </div>
+                    <div class="settings-tab-panel" id="tab-wallpaper" style="display: none;">
+                        <div class="wallpaper-options">
+                            <button class="wp-btn" data-color="space">🌌 Deep Cosmic</button>
+                            <button class="wp-btn" data-color="nebula">🟣 Orion Nebula</button>
+                        </div>
+                    </div>
+                    <div class="settings-tab-panel" id="tab-general" style="display: none;">
+                        <div style="margin-bottom: 16px;">
+                            <label style="display: block; font-size: 13px; margin-bottom: 4px;">Display Name</label>
+                            <input type="text" id="set-username" style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 6px; border-radius: 4px;">
+                        </div>
+                        <button id="set-reset-os" style="width: 100%; padding: 8px; background: rgba(255,95,86,0.1); border: 1px solid #ff5f56; color: #ff5f56; border-radius: 6px; cursor: pointer;">Reset All Data</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Spotlight Search -->
+    <div id="spotlight-overlay" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100000; align-items: flex-start; justify-content: center; padding-top: 100px;">
+        <div style="width: 500px; background: rgba(20, 24, 38, 0.9); backdrop-filter: blur(20px); border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); overflow: hidden;">
+            <input type="text" id="spotlight-input" placeholder="Spotlight Search" style="width: 100%; padding: 16px; background: transparent; border: none; color: white; font-size: 18px; outline: none;">
+            <div id="spotlight-results" style="max-height: 300px; overflow-y: auto; border-top: 1px solid rgba(255,255,255,0.05);"></div>
+        </div>
+    </div>
+
+    <!-- Notifications -->
+    <div class="mac-notification" id="system-popup" style="display: none;">
+        <div class="notification-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <span style="font-size: 12px; font-weight: bold; color: #b794f4;">🌌 System Alert</span>
+            <span id="close-popup" style="cursor: pointer; opacity: 0.6;">✕</span>
+        </div>
+        <div id="popup-text" style="font-size: 13px;">Operational loop initialized.</div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/utils.js"></script>
+    <script src="js/vfs.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/windowManager.js"></script>
+    <script src="js/finder.js"></script>
+    <script src="js/terminal.js"></script>
+    <script src="js/missionControl.js"></script>
+    <script src="js/settings.js"></script>
+    <script src="js/games.js"></script>
+    <script src="js/apps.js"></script>
+    <script src="js/controlCenter.js"></script>
+    <script src="js/core.js"></script>
+    <div id="zenith-assistant-btn">
+    🤖
+</div>
+
+<div id="zenith-assistant-panel" class="assistant-hidden">
+    <div class="assistant-header">
+        <h3>Zenith Assistant</h3>
+        <span id="assistant-close">✕</span>
+    </div>
+
+    <div class="assistant-content">
+
+        <p>👋 Welcome back.</p>
+
+        <button id="assistant-finder">📁 Finder</button>
+
+        <button id="assistant-terminal">💻 Terminal</button>
+
+        <button id="assistant-settings">⚙️ Settings</button>
+
+        <button id="assistant-games">🎮 Games</button>
+
+        <hr>
+
+        <p id="assistant-tip"></p>
+
+    </div>
+</div>
+</body>
+</html>
+
             <p class="glowing-text">> LINK ESTABLISHED SECURELY.</p>
             <div class="terminal-input-line">
                 <span style="color: #b794f4;">nasa-os:~ core$</span>
