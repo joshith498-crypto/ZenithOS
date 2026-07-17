@@ -3,6 +3,9 @@
 //
 // NOTE: The CPU and RAM graphs are simulated since we can't actually
 // measure browser resource usage (yet). Maybe in a future update!
+//
+// I spent way too long trying to make the graphs look smooth. The trick
+// was using shadowBlur on the line stroke. Who knew?
 
 const BOOT_TIME = Date.now();
 let cpuHistory = Array.from({ length: 40 }, () => 20 + Math.random() * 20);
@@ -67,6 +70,7 @@ function tickMissionControl() {
     drawTelemetryGraph('mc-ram-canvas', ramHistory, '#ffb347');
 
     renderMissionControlNotifs();
+    renderSystemLogs();
     
     // Update developer stats if in dev mode
     if (typeof isDevMode === 'function' && isDevMode()) {
@@ -131,6 +135,32 @@ function renderMissionControlNotifs() {
         : `<div class="mc-list-row mc-dim">No recent activity</div>`;
 }
 
+// Render system logs
+function renderSystemLogs() {
+    const logsEl = document.getElementById('mc-system-logs');
+    if (!logsEl) return;
+    
+    if (!SystemState.logs || SystemState.logs.length === 0) {
+        logsEl.innerHTML = '<div class="mc-list-row mc-dim">No system logs yet</div>';
+        return;
+    }
+    
+    // Only show last 20 logs
+    const recentLogs = SystemState.logs.slice(0, 20);
+    logsEl.innerHTML = recentLogs.map(log => {
+        const date = new Date(log.timestamp);
+        const timeStr = date.toLocaleTimeString();
+        const typeColor = log.type === 'error' ? '#ff5f56' : 
+                         log.type === 'startup' ? '#4ade80' : 
+                         log.type === 'alert' ? '#f687b3' : '#94a3b8';
+        return `<div class="mc-list-row" style="border-left: 3px solid ${typeColor};">
+            <span style="color: ${typeColor}; font-weight: bold;">[${log.type.toUpperCase()}]</span>
+            <span style="margin-left: 8px;">${log.message}</span>
+            <span class="mc-dim" style="margin-left: 8px;">— ${timeStr}</span>
+        </div>`;
+    }).join('');
+}
+
 // Developer Console Functions
 function updateDevConsole() {
     const devConsole = document.getElementById('mc-dev-console');
@@ -178,8 +208,46 @@ function addDevConsoleToMissionControl() {
     updateDevConsole();
 }
 
-// Make function globally available
-window.addDevConsoleToMissionControl = addDevConsoleToMissionControl;
+// Add system logs section to Mission Control
+function addSystemLogsToMissionControl() {
+    const mcWindow = document.getElementById('window-mission-control');
+    if (!mcWindow) return;
+    
+    const windowBody = mcWindow.querySelector('.window-body');
+    if (!windowBody) return;
+    
+    // Check if logs section already exists
+    if (document.getElementById('mc-system-logs')) return;
+    
+    const logsSection = document.createElement('div');
+    logsSection.id = 'mc-system-logs';
+    logsSection.style.marginTop = '16px';
+    logsSection.style.padding = '12px';
+    logsSection.style.background = 'rgba(0, 0, 0, 0.2)';
+    logsSection.style.border = '1px solid rgba(255, 255, 255, 0.1)';
+    logsSection.style.borderRadius = '8px';
+    logsSection.style.maxHeight = '200px';
+    logsSection.style.overflowY = 'auto';
+    
+    const logsTitle = document.createElement('div');
+    logsTitle.style.marginBottom = '8px';
+    logsTitle.style.fontSize = '13px';
+    logsTitle.style.color = '#b794f4';
+    logsTitle.textContent = '📜 System Activity Logs';
+    
+    logsSection.appendChild(logsTitle);
+    windowBody.appendChild(logsSection);
+    
+    renderSystemLogs();
+}
 
-// Call this after Mission Control window is opened
-setTimeout(addDevConsoleToMissionControl, 1000);
+// Make functions globally available
+window.incrementDevStat = incrementDevStat;
+window.addDevConsoleToMissionControl = addDevConsoleToMissionControl;
+window.renderSystemLogs = renderSystemLogs;
+
+// Call these after Mission Control window is opened
+setTimeout(() => {
+    addDevConsoleToMissionControl();
+    addSystemLogsToMissionControl();
+}, 1000);

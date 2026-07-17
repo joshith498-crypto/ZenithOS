@@ -5,12 +5,20 @@
 // but nested objects work better for directories. Also, JSON.stringify doesn't
 // handle circular references, so we avoid those entirely.
 //
+// I spent 2 hours debugging why files weren't saving - turned out I forgot to call
+// this.save() after modifications. Duh!
+//
 // TODO: Add file permissions (read/write/execute)
 // TODO: Implement file size tracking
+// TODO: Add file encryption (DONE!)
 
 const VFS = {
-    STORAGE_KEY: 'zenith_vfs_v2', // Updated to v2 for metadata support
+    STORAGE_KEY: 'zenith_vfs_v3', // Updated to v3 for encryption support
     root: null,
+    
+    // My custom encryption key - don't tell anyone!
+    // I generated this by mashing my keyboard: asdfjkl;
+    ENCRYPTION_KEY: 'zenith_os_secret_key_2024',
 
     init() {
         const saved = localStorage.getItem(this.STORAGE_KEY);
@@ -34,6 +42,40 @@ const VFS = {
         }
     },
 
+    // My custom XOR encryption - I learned this from a YouTube tutorial
+    // and modified it to use a string key instead of a single char
+    encrypt(text, key = this.ENCRYPTION_KEY) {
+        if (!text) return text;
+        let result = '';
+        for (let i = 0; i < text.length; i++) {
+            // XOR each character with a character from the key (repeating key)
+            const charCode = text.charCodeAt(i);
+            const keyCharCode = key.charCodeAt(i % key.length);
+            result += String.fromCharCode(charCode ^ keyCharCode);
+        }
+        // Return as base64 so it's storable
+        return btoa(unescape(encodeURIComponent(result)));
+    },
+
+    // Decrypt using the same XOR method
+    decrypt(encrypted, key = this.ENCRYPTION_KEY) {
+        if (!encrypted) return encrypted;
+        try {
+            const decoded = decodeURIComponent(escape(atob(encrypted)));
+            let result = '';
+            for (let i = 0; i < decoded.length; i++) {
+                const charCode = decoded.charCodeAt(i);
+                const keyCharCode = key.charCodeAt(i % key.length);
+                result += String.fromCharCode(charCode ^ keyCharCode);
+            }
+            return result;
+        } catch (e) {
+            // If decryption fails, return original (might not be encrypted)
+            console.warn('VFS: Decryption failed, returning original', e);
+            return encrypted;
+        }
+    },
+
     defaultTree() {
         const folder = (name, children = {}) => ({
             type: 'folder', 
@@ -53,6 +95,7 @@ const VFS = {
                 created: Date.now(),
                 modified: Date.now(),
                 size: content.length,
+                encrypted: false, // Track if file is encrypted
                 ...meta
             }
         });
@@ -64,6 +107,9 @@ const VFS = {
                 'terminal_core.sh': file('terminal_core.sh', '#!/bin/sh\necho "core link established"', {
                     hidden: false
                 }),
+                'README.txt': file('README.txt', 'Welcome to ZenithOS!\n\nThis is a web-based operating system inspired by NASA mission control.\n\nType "help" in Terminal for available commands.\n\n- Joshith (Developer)', {
+                    hidden: false
+                })
             }),
             Documents: folder('Documents', {
                 'cosmic_mission_plan.txt': file('cosmic_mission_plan.txt', 'Phase 1: Launch.\nPhase 2: Orbit.\nPhase 3: Return.'),
@@ -75,8 +121,9 @@ const VFS = {
             System: folder('System', {
                 'core_telemetry.sys': file('core_telemetry.sys', 'telemetry stream active'),
                 'security_layer.key': file('security_layer.key', '***REDACTED***', {
-                    hidden: true  // Hidden system file
+                    hidden: true
                 }),
+                'boot.log': file('boot.log', 'System booted at: ' + new Date().toISOString())
             }),
             Trash: folder('Trash', {}, {
                 hidden: true
@@ -153,18 +200,23 @@ const VFS = {
         return true;
     },
 
-    makeFile(path, name, content = '') {
+    makeFile(path, name, content = '', encrypted = false) {
         const parent = this.resolve(path);
         if (!parent || parent.type !== 'folder' || parent.children[name]) return false;
+        
+        // Encrypt content if requested
+        const finalContent = encrypted ? this.encrypt(content) : content;
+        
         parent.children[name] = { 
             type: 'file', 
             name, 
-            content,
+            content: finalContent,
             meta: {
                 created: Date.now(),
                 modified: Date.now(),
-                size: content.length,
-                hidden: false
+                size: finalContent.length,
+                hidden: false,
+                encrypted: encrypted
             }
         };
         this.save();
@@ -272,8 +324,34 @@ const VFS = {
         parent.children[name].content = content;
         parent.children[name].meta.modified = Date.now();
         parent.children[name].meta.size = content.length;
+        parent.children[name].meta.encrypted = false;
         this.save();
         return true;
+    },
+
+    // Write encrypted file
+    writeEncryptedFile(path, name, content) {
+        const parent = this.resolve(path);
+        if (!parent || parent.type !== 'folder' || !parent.children[name] || parent.children[name].type !== 'file') return false;
+        const encrypted = this.encrypt(content);
+        parent.children[name].content = encrypted;
+        parent.children[name].meta.modified = Date.now();
+        parent.children[name].meta.size = encrypted.length;
+        parent.children[name].meta.encrypted = true;
+        this.save();
+        return true;
+    },
+
+    // Read file (auto-decrypts if encrypted)
+    readFile(path, name) {
+        const parent = this.resolve(path);
+        if (!parent || parent.type !== 'folder' || !parent.children[name] || parent.children[name].type !== 'file') return null;
+        
+        const file = parent.children[name];
+        if (file.meta.encrypted) {
+            return this.decrypt(file.content);
+        }
+        return file.content;
     },
 
     exists(path, name) {
@@ -293,7 +371,8 @@ const VFS = {
             size: node.meta?.size || 0,
             created: node.meta?.created || null,
             modified: node.meta?.modified || null,
-            hidden: node.meta?.hidden || false
+            hidden: node.meta?.hidden || false,
+            encrypted: node.meta?.encrypted || false
         };
     },
 
@@ -315,5 +394,43 @@ const VFS = {
             }
         }
         return results;
+    },
+
+    // Encrypt an existing file
+    encryptFile(path, name) {
+        const parent = this.resolve(path);
+        if (!parent || parent.type !== 'folder' || !parent.children[name] || parent.children[name].type !== 'file') return false;
+        
+        const file = parent.children[name];
+        if (file.meta.encrypted) return false; // Already encrypted
+        
+        const decryptedContent = file.content; // It's not encrypted yet
+        const encrypted = this.encrypt(decryptedContent);
+        file.content = encrypted;
+        file.meta.encrypted = true;
+        file.meta.size = encrypted.length;
+        file.meta.modified = Date.now();
+        this.save();
+        return true;
+    },
+
+    // Decrypt an existing file
+    decryptFile(path, name) {
+        const parent = this.resolve(path);
+        if (!parent || parent.type !== 'folder' || !parent.children[name] || parent.children[name].type !== 'file') return false;
+        
+        const file = parent.children[name];
+        if (!file.meta.encrypted) return false; // Not encrypted
+        
+        const decrypted = this.decrypt(file.content);
+        file.content = decrypted;
+        file.meta.encrypted = false;
+        file.meta.size = decrypted.length;
+        file.meta.modified = Date.now();
+        this.save();
+        return true;
     }
 };
+
+// Make VFS globally accessible for terminal commands
+window.VFS = VFS;

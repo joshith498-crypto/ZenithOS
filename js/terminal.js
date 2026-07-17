@@ -6,6 +6,9 @@
 // Also, the terminal input field doesn't play well with preventDefault,
 // so I had to be careful with event handling.
 //
+// I spent way too long debugging why the terminal wasn't working - turned out
+// I had a typo in the event listener ('keypress' instead of 'keydown').
+//
 // FIX: Changed isDevMode to use window.isDevMode to avoid reference errors
 
 // TODO: Add tab completion for filenames
@@ -44,7 +47,21 @@ function setupTerminalConsole() {
         "The Apollo 11 guidance computer had only 64KB of memory - less than a digital watch today!",
         "Saturn's rings are made of billions of ice and rock particles, some as small as dust, others as large as mountains.",
         "The Hubble Space Telescope has made over 1.5 million observations since its launch in 1990.",
-        "Mars has the largest volcano in the solar system - Olympus Mons, about 13.6 miles high."
+        "Mars has the largest volcano in the solar system - Olympus Mons, about 13.6 miles high.",
+        "The Sun makes up 99.86% of the solar system's mass - Jupiter takes up most of the rest!",
+        "A neutron star the size of a sugar cube would weigh about 1 billion tons on Earth."
+    ];
+
+    // My personal quotes for the 'quote' command
+    const myQuotes = [
+        "Code like a poet, debug like a detective. - Joshith",
+        "The best code is the code that works. The second best is the code that's pretty.",
+        "If at first you don't succeed, try Ctrl+Z and pretend it never happened.",
+        "I don't always test my code, but when I do, I do it in production.",
+        "404: Coffee not found. System halted.",
+        "There are only 10 types of people: those who understand binary and those who don't.",
+        "A computer once beat me at chess, but it was no match for me at kickboxing.",
+        "I would love to change the world, but they won't give me the source code."
     ];
 
     // Add command to history
@@ -62,6 +79,13 @@ function setupTerminalConsole() {
     // Helper function to check dev mode safely
     function checkDevMode() {
         return typeof window.isDevMode === 'function' && window.isDevMode();
+    }
+
+    // Get current directory contents as string
+    function getCurrentDirContents() {
+        if (typeof VFS === 'undefined') return '';
+        const items = showHiddenFiles ? VFS.listAll(termPath) : VFS.list(termPath);
+        return items.length ? items.map(i => i.type === 'folder' ? `${i.name}/` : i.name).join('  ') : '(empty)';
     }
 
     // Handle up/down arrow for command history
@@ -103,8 +127,9 @@ function setupTerminalConsole() {
                 printLine('Available commands:');
                 printLine('  help, ls, pwd, cd, mkdir, touch, rm, mv, cp, cat, clear, date, whoami');
                 printLine('  zenith, echo, reboot, shutdown, neofetch, top, easteregg, fortune');
+                printLine('  quote, encrypt, decrypt, search, stat, history');
                 if (checkDevMode()) {
-                    printLine('  Dev Mode: lsall, hidden, secret');
+                    printLine('  Dev Mode: lsall, hidden, secret, benchmark');
                 }
                 break;
             case 'pwd':
@@ -112,8 +137,7 @@ function setupTerminalConsole() {
                 break;
             case 'ls': {
                 if (typeof VFS === 'undefined') break;
-                const items = showHiddenFiles ? VFS.listAll(termPath) : VFS.list(termPath);
-                printLine(items.length ? items.map(i => i.type === 'folder' ? `${i.name}/` : i.name).join('  ') : '(empty)');
+                printLine(getCurrentDirContents());
                 break;
             }
             case 'lsall': {
@@ -186,9 +210,13 @@ function setupTerminalConsole() {
             case 'cat': {
                 if (typeof VFS === 'undefined') break;
                 if (!args[0]) { printLine('cat: missing operand'); break; }
-                const node = VFS.resolve([...termPath, args[0]]);
-                if (node && node.type === 'file') printLine(node.content || '(empty file)');
-                else printLine(`cat: ${args[0]}: No such file`);
+                // Use readFile which auto-decrypts
+                const content = VFS.readFile(termPath, args[0]);
+                if (content !== null) {
+                    printLine(content || '(empty file)');
+                } else {
+                    printLine(`cat: ${args[0]}: No such file`);
+                }
                 break;
             }
             case 'clear':
@@ -269,6 +297,65 @@ function setupTerminalConsole() {
                 printLine(nasaFacts[Math.floor(Math.random() * nasaFacts.length)]);
                 printLine('');
                 break;
+            case 'quote':
+                printLine('');
+                printLine('Wisdom from Joshith:');
+                printLine(myQuotes[Math.floor(Math.random() * myQuotes.length)]);
+                printLine('');
+                break;
+            case 'encrypt': {
+                if (typeof VFS === 'undefined') break;
+                if (!args[0]) { printLine('encrypt: missing operand'); break; }
+                const success = VFS.encryptFile(termPath, args[0]);
+                printLine(success ? `Encrypted: ${args[0]}` : `encrypt: cannot encrypt '${args[0]}'`);
+                if (typeof renderFinder === 'function') renderFinder();
+                break;
+            }
+            case 'decrypt': {
+                if (typeof VFS === 'undefined') break;
+                if (!args[0]) { printLine('decrypt: missing operand'); break; }
+                const success = VFS.decryptFile(termPath, args[0]);
+                printLine(success ? `Decrypted: ${args[0]}` : `decrypt: cannot decrypt '${args[0]}'`);
+                if (typeof renderFinder === 'function') renderFinder();
+                break;
+            }
+            case 'search': {
+                if (typeof VFS === 'undefined') break;
+                if (!args[0]) { printLine('search: missing operand'); break; }
+                const results = VFS.search(args[0], termPath);
+                if (results.length === 0) {
+                    printLine('No matches found.');
+                } else {
+                    printLine(`Found ${results.length} match(es):`);
+                    results.forEach(r => {
+                        printLine(`  ${r.path.join('/')}${r.type === 'folder' ? '/' : ''}`);
+                    });
+                }
+                break;
+            }
+            case 'stat': {
+                if (typeof VFS === 'undefined') break;
+                if (!args[0]) { printLine('stat: missing operand'); break; }
+                const info = VFS.stat(termPath, args[0]);
+                if (info) {
+                    printLine(`File: ${info.name}`);
+                    printLine(`Type: ${info.type}`);
+                    printLine(`Size: ${info.size} bytes`);
+                    printLine(`Created: ${new Date(info.created).toLocaleString()}`);
+                    printLine(`Modified: ${new Date(info.modified).toLocaleString()}`);
+                    printLine(`Hidden: ${info.hidden}`);
+                    printLine(`Encrypted: ${info.encrypted}`);
+                } else {
+                    printLine(`stat: cannot stat '${args[0]}': No such file`);
+                }
+                break;
+            }
+            case 'history':
+                printLine('Command History:');
+                commandHistory.slice(-10).forEach((cmd, i) => {
+                    printLine(`  ${commandHistory.length - 10 + i + 1}: ${cmd}`);
+                });
+                break;
             case 'hidden':
                 // Toggle showing hidden files
                 showHiddenFiles = !showHiddenFiles;
@@ -281,6 +368,7 @@ function setupTerminalConsole() {
                     printLine('Secret System Files:');
                     printLine('  /System/security_layer.key - Contains encrypted credentials');
                     printLine('  /System/core_telemetry.sys - Real-time system data');
+                    printLine('  /System/boot.log - System startup log');
                     printLine('');
                     printLine('Try: cat /System/security_layer.key');
                     printLine('');
@@ -288,6 +376,48 @@ function setupTerminalConsole() {
                     printLine('secret: Access denied. Activate developer mode first.');
                 }
                 break;
+            case 'benchmark': {
+                if (!checkDevMode()) {
+                    printLine('benchmark: Access denied. Dev mode only.');
+                    break;
+                }
+                printLine('Running system benchmark...');
+                
+                // My custom benchmark - tests various operations
+                const start = Date.now();
+                
+                // Test 1: Math operations
+                let x = 0;
+                for (let i = 0; i < 100000; i++) {
+                    x += Math.sqrt(i) * Math.random();
+                }
+                const mathTime = Date.now() - start;
+                
+                // Test 2: String operations
+                let str = '';
+                for (let i = 0; i < 10000; i++) {
+                    str += 'a';
+                }
+                const stringTime = Date.now() - start - mathTime;
+                
+                // Test 3: Array operations
+                const arr = [];
+                for (let i = 0; i < 10000; i++) {
+                    arr.push(i);
+                }
+                arr.sort((a, b) => b - a);
+                const arrayTime = Date.now() - start - mathTime - stringTime;
+                
+                printLine('');
+                printLine('Benchmark Results:');
+                printLine(`  Math Operations: ${mathTime}ms`);
+                printLine(`  String Operations: ${stringTime}ms`);
+                printLine(`  Array Operations: ${arrayTime}ms`);
+                printLine(`  Total: ${Date.now() - start}ms`);
+                printLine('');
+                printLine('Performance: ' + (Date.now() - start < 50 ? '⚡ Blazing Fast!' : Date.now() - start < 100 ? '🚀 Fast' : '🐢 Slow'));
+                break;
+            }
             case 'reboot':
                 printLine('WARNING: System rebooting...');
                 setTimeout(() => location.reload(), 1200);

@@ -3,13 +3,17 @@
 // 
 // NOTE: This file orchestrates all the modules. The order of initialization matters!
 // I learned this the hard way when VFS wasn't loaded before Terminal tried to use it.
+//
+// Also, I spent like an hour debugging why the clock wasn't updating - turned out
+// I forgot to call setInterval. Classic me.
 
 const SystemState = {
     userAccount: 'Astronaut Voyager',
     energyCrystals: parseInt(localStorage.getItem('qos_crystals')) || 0,
     currentPath: ['Desktop'],
     bootTime: Date.now(), // Track when the system booted
-    activeWindows: new Set() // Track open windows
+    activeWindows: new Set(), // Track open windows
+    logs: [] // System activity logs
 };
 
 // Global uptime function for neofetch command
@@ -31,6 +35,14 @@ function showGlobalAlert(message, duration = 3000) {
     popup.style.display = 'block';
     popup.style.opacity = '1';
     
+    // Add to system logs
+    SystemState.logs.unshift({
+        timestamp: Date.now(),
+        message: message,
+        type: 'alert'
+    });
+    if (SystemState.logs.length > 50) SystemState.logs.pop();
+    
     setTimeout(() => {
         popup.style.opacity = '0';
         setTimeout(() => {
@@ -39,15 +51,52 @@ function showGlobalAlert(message, duration = 3000) {
     }, duration);
 }
 
+// System logging function
+function logSystemEvent(message, type = 'info') {
+    SystemState.logs.unshift({
+        timestamp: Date.now(),
+        message: message,
+        type: type
+    });
+    if (SystemState.logs.length > 50) SystemState.logs.pop();
+    
+    // Save logs to localStorage
+    try {
+        localStorage.setItem('zenith_system_logs', JSON.stringify(SystemState.logs));
+    } catch (e) {
+        console.warn('Failed to save logs:', e);
+    }
+    
+    // Update Mission Control logs if visible
+    if (typeof renderSystemLogs === 'function') {
+        renderSystemLogs();
+    }
+}
+
+// Load saved logs on startup
+function loadSystemLogs() {
+    try {
+        const savedLogs = localStorage.getItem('zenith_system_logs');
+        if (savedLogs) {
+            SystemState.logs = JSON.parse(savedLogs);
+        }
+    } catch (e) {
+        console.warn('Failed to load logs:', e);
+        SystemState.logs = [];
+    }
+}
+
 // Track active windows
 function registerWindow(windowId) {
     SystemState.activeWindows.add(windowId);
     updateMissionControl();
+    logSystemEvent(`Window opened: ${windowId}`);
 }
 
 function unregisterWindow(windowId) {
     SystemState.activeWindows.delete(windowId);
     updateMissionControl();
+    logSystemEvent(`Window closed: ${windowId}`);
 }
 
 function updateMissionControl() {
@@ -57,6 +106,9 @@ function updateMissionControl() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Load system logs
+    loadSystemLogs();
+    
     // Core Init
     if (typeof setupAuth === 'function') setupAuth();
     initializeClock();
@@ -86,10 +138,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize starfield after everything else
     createStarfield();
     
+    // Log system startup
+    logSystemEvent('System initialized', 'startup');
+    
     // Set up global error handler for debugging
     window.onerror = function(message, source, lineno, colno, error) {
         console.error('ZenithOS Error:', message, 'in', source, 'at line', lineno);
         showGlobalAlert(`System Error: ${message}`);
+        logSystemEvent(`ERROR: ${message} at ${source}:${lineno}`, 'error');
         return true; // Prevent default browser error handling
     };
 });
@@ -132,6 +188,7 @@ function runBootSequence() {
         'LOADING DOCK INTERFACE...',
         'STARTING WINDOW MANAGER...',
         'INITIALIZING STARFIELD RENDERER...',
+        'LOADING SYSTEM LOGS...',
         'ALL SYSTEMS NOMINAL.'
     ];
 
@@ -146,6 +203,7 @@ function runBootSequence() {
                     if (typeof showGlobalAlert === 'function') {
                         showGlobalAlert(`Welcome back, ${SystemState.userAccount}. All systems nominal.`);
                     }
+                    logSystemEvent('System booted successfully', 'startup');
                 }, 500);
             }, 250);
             return;
@@ -193,9 +251,19 @@ function createStarfield() {
             star.style.animationDuration = "1s";
         }
         
+        // Some stars are colored (my personal touch)
+        if (Math.random() > 0.9) {
+            const colors = ['#b794f4', '#f687b3', '#00ff66', '#ffb347'];
+            star.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            star.style.borderRadius = '50%';
+        }
+        
         field.appendChild(star);
     }
 }
 
 // Make createStarfield available globally
 window.createStarfield = createStarfield;
+
+// Make logSystemEvent globally accessible
+window.logSystemEvent = logSystemEvent;
