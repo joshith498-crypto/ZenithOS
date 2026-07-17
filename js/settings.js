@@ -90,7 +90,7 @@ function setupSettingsPanel() {
     if (savedAccent) document.documentElement.style.setProperty('--qos-accent', savedAccent);
 
     // Developer mode toggle (hidden by default)
-    if (isDevMode()) {
+    if (typeof window.isDevMode === 'function' && window.isDevMode()) {
         const devModeToggle = document.createElement('div');
         devModeToggle.style.marginTop = '16px';
         devModeToggle.style.padding = '8px';
@@ -156,7 +156,7 @@ function setupWallpaperEngine() {
 
     // Add custom wallpaper upload feature
     const wallpaperTab = document.getElementById('tab-wallpaper');
-    if (wallpaperTab && isDevMode()) {
+    if (wallpaperTab && typeof window.isDevMode === 'function' && window.isDevMode()) {
         const uploadContainer = document.createElement('div');
         uploadContainer.style.marginTop = '16px';
         uploadContainer.style.padding = '12px';
@@ -252,3 +252,12 @@ function setupWallpaperEngine() {
         });
     }
 }
+
+// Make incrementDevStat available globally for terminal
+window.incrementDevStat = function(stat) {
+    if (typeof devModeStats !== 'undefined') {
+        if (devModeStats[stat] !== undefined) {
+            devModeStats[stat]++;
+        }
+    }
+};

@@ -5,6 +5,8 @@
 // the up/down arrow keys without breaking the normal input behavior.
 // Also, the terminal input field doesn't play well with preventDefault,
 // so I had to be careful with event handling.
+//
+// FIX: Changed isDevMode to use window.isDevMode to avoid reference errors
 
 // TODO: Add tab completion for filenames
 // TODO: Fix history navigation when input is empty
@@ -26,6 +28,11 @@ function setupTerminalConsole() {
         line.textContent = text;
         body.insertBefore(line, input.parentElement);
         body.scrollTop = body.scrollHeight;
+        
+        // Track commands for dev mode stats
+        if (typeof window.incrementDevStat === 'function') {
+            window.incrementDevStat('commandsExecuted');
+        }
     };
 
     // NASA facts for easter eggs
@@ -51,6 +58,11 @@ function setupTerminalConsole() {
             }
         }
     };
+
+    // Helper function to check dev mode safely
+    function checkDevMode() {
+        return typeof window.isDevMode === 'function' && window.isDevMode();
+    }
 
     // Handle up/down arrow for command history
     input.addEventListener('keydown', (e) => {
@@ -91,7 +103,7 @@ function setupTerminalConsole() {
                 printLine('Available commands:');
                 printLine('  help, ls, pwd, cd, mkdir, touch, rm, mv, cp, cat, clear, date, whoami');
                 printLine('  zenith, echo, reboot, shutdown, neofetch, top, easteregg, fortune');
-                if (isDevMode()) {
+                if (checkDevMode()) {
                     printLine('  Dev Mode: lsall, hidden, secret');
                 }
                 break;
@@ -106,7 +118,7 @@ function setupTerminalConsole() {
             }
             case 'lsall': {
                 // Dev mode command to show all files including hidden
-                if (typeof VFS === 'undefined' || !isDevMode()) {
+                if (typeof VFS === 'undefined' || !checkDevMode()) {
                     printLine('lsall: command not found');
                     break;
                 }
@@ -126,19 +138,32 @@ function setupTerminalConsole() {
             case 'mkdir':
                 if (typeof VFS === 'undefined') break;
                 if (!args[0]) { printLine('mkdir: missing operand'); break; }
-                printLine(VFS.makeFolder(termPath, args[0]) ? '' : `mkdir: cannot create '${args[0]}'`);
+                const success = VFS.makeFolder(termPath, args[0]);
+                printLine(success ? '' : `mkdir: cannot create '${args[0]}'`);
+                if (success && typeof window.incrementDevStat === 'function') {
+                    window.incrementDevStat('filesCreated');
+                }
                 if (typeof renderFinder === 'function') renderFinder();
                 break;
             case 'touch':
                 if (typeof VFS === 'undefined') break;
                 if (!args[0]) { printLine('touch: missing operand'); break; }
-                if (!VFS.exists(termPath, args[0])) VFS.makeFile(termPath, args[0], '');
+                if (!VFS.exists(termPath, args[0])) {
+                    VFS.makeFile(termPath, args[0], '');
+                    if (typeof window.incrementDevStat === 'function') {
+                        window.incrementDevStat('filesCreated');
+                    }
+                }
                 if (typeof renderFinder === 'function') renderFinder();
                 break;
             case 'rm':
                 if (typeof VFS === 'undefined') break;
                 if (!args[0]) { printLine('rm: missing operand'); break; }
-                printLine(VFS.remove(termPath, args[0]) ? '' : `rm: cannot remove '${args[0]}': No such file`);
+                const success = VFS.remove(termPath, args[0]);
+                printLine(success ? '' : `rm: cannot remove '${args[0]}': No such file`);
+                if (success && typeof window.incrementDevStat === 'function') {
+                    window.incrementDevStat('filesDeleted');
+                }
                 if (typeof renderFinder === 'function') renderFinder();
                 break;
             case 'mv': {
@@ -251,7 +276,7 @@ function setupTerminalConsole() {
                 break;
             case 'secret':
                 // Secret command to reveal hidden system files
-                if (isDevMode()) {
+                if (checkDevMode()) {
                     printLine('');
                     printLine('Secret System Files:');
                     printLine('  /System/security_layer.key - Contains encrypted credentials');

@@ -4,8 +4,8 @@
 const AUTH_KEY = 'qos_account_v1';
 const DEV_MODE_KEY = 'zenith_dev_mode';
 
-// Developer mode state
-let devModeActive = localStorage.getItem(DEV_MODE_KEY) === 'true';
+// Developer mode state - MAKE GLOBAL
+window.devModeActive = localStorage.getItem(DEV_MODE_KEY) === 'true';
 
 // Konami code sequence
 const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
@@ -13,6 +13,11 @@ let konamiIndex = 0;
 
 // Listen for Konami code globally
 document.addEventListener('keydown', (e) => {
+    // Skip if typing in an input field
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+        return;
+    }
+    
     if (e.key === konamiCode[konamiIndex]) {
         konamiIndex++;
         if (konamiIndex === konamiCode.length) {
@@ -24,8 +29,13 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
+// Global function to check dev mode
+window.isDevMode = function() {
+    return window.devModeActive;
+};
+
 function activateDevMode() {
-    devModeActive = true;
+    window.devModeActive = true;
     localStorage.setItem(DEV_MODE_KEY, 'true');
     showGlobalAlert('DEVELOPER MODE ACTIVATED! Hidden features unlocked.');
     console.log('%c🚀 DEVELOPER MODE ACTIVATED', 'color: #b794f4; font-size: 20px; font-weight: bold;');
@@ -34,10 +44,11 @@ function activateDevMode() {
     console.log('%c- neofetch', 'color: #b794f4;');
     console.log('%c- top', 'color: #b794f4;');
     console.log('%c- fortune', 'color: #b794f4;');
-}
-
-function isDevMode() {
-    return devModeActive;
+    
+    // Refresh Mission Control if open to show dev console
+    if (typeof addDevConsoleToMissionControl === 'function') {
+        addDevConsoleToMissionControl();
+    }
 }
 
 function getAccount() {
@@ -57,7 +68,7 @@ function setupAuth() {
     if (account) {
         signupCard.style.display = 'none';
         signinCard.style.display = 'flex';
-        document.getElementById('signin-avatar').textContent = account.avatar || 'F469F680';
+        document.getElementById('signin-avatar').textContent = account.avatar || '👩‍🚀';
         document.getElementById('signin-name').textContent = `Welcome back, ${account.displayName}`;
         document.getElementById('signin-username').value = account.username;
     } else {
@@ -66,7 +77,7 @@ function setupAuth() {
     }
 
     // Signup avatar picker
-    let selectedAvatar = 'F469F680';
+    let selectedAvatar = '👩‍🚀';
     document.querySelectorAll('#signup-avatar-picker .avatar-option').forEach(btn => {
         btn.onclick = () => {
             document.querySelectorAll('#signup-avatar-picker .avatar-option').forEach(b => b.classList.remove('selected'));

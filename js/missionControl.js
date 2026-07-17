@@ -54,7 +54,7 @@ function tickMissionControl() {
     const listEl = document.getElementById('mc-window-list');
     if (listEl) {
         listEl.innerHTML = openWindows.length
-            ? openWindows.map(w => `<div class="mc-list-row">F4E2 ${w.querySelector('.window-title') ? w.querySelector('.window-title').textContent : w.id}</div>`).join('')
+            ? openWindows.map(w => `<div class="mc-list-row">📂 ${w.querySelector('.window-title') ? w.querySelector('.window-title').textContent : w.id}</div>`).join('')
             : `<div class="mc-list-row mc-dim">No active modules</div>`;
     }
 
@@ -69,7 +69,7 @@ function tickMissionControl() {
     renderMissionControlNotifs();
     
     // Update developer stats if in dev mode
-    if (isDevMode()) {
+    if (typeof isDevMode === 'function' && isDevMode()) {
         updateDevConsole();
     }
 }
@@ -127,7 +127,7 @@ function renderMissionControlNotifs() {
     const notifEl = document.getElementById('mc-notif-list');
     if (!notifEl) return;
     notifEl.innerHTML = NotificationLog.length
-        ? NotificationLog.map(n => `<div class="mc-list-row">F4E2 ${n.message} <span class="mc-dim"> ${n.time.toLocaleTimeString()}</span></div>`).join('')
+        ? NotificationLog.map(n => `<div class="mc-list-row">📝 ${n.message} <span class="mc-dim">— ${n.time.toLocaleTimeString()}</span></div>`).join('')
         : `<div class="mc-list-row mc-dim">No recent activity</div>`;
 }
 
@@ -155,7 +155,10 @@ function updateDevConsole() {
 // Add developer console to Mission Control window
 function addDevConsoleToMissionControl() {
     const mcWindow = document.getElementById('window-mission-control');
-    if (!mcWindow || !isDevMode()) return;
+    if (!mcWindow) return;
+    
+    // Check if already in dev mode
+    if (typeof isDevMode !== 'function' || !isDevMode()) return;
     
     const windowBody = mcWindow.querySelector('.window-body');
     if (!windowBody) return;
@@ -174,6 +177,9 @@ function addDevConsoleToMissionControl() {
     windowBody.appendChild(devConsole);
     updateDevConsole();
 }
+
+// Make function globally available
+window.addDevConsoleToMissionControl = addDevConsoleToMissionControl;
 
 // Call this after Mission Control window is opened
 setTimeout(addDevConsoleToMissionControl, 1000);
