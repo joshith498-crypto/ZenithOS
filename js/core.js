@@ -6,6 +6,8 @@
 //
 // Also, I spent like an hour debugging why the clock wasn't updating - turned out
 // I forgot to call setInterval. Classic me.
+//
+// FIX: Added setTimeout to ensure DOM is fully loaded before initializing modules
 
 const SystemState = {
     userAccount: 'Astronaut Voyager',
@@ -105,49 +107,52 @@ function updateMissionControl() {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+// Initialize the system with a delay to ensure DOM is ready
+function initializeSystem() {
     // Load system logs
     loadSystemLogs();
     
     // Core Init
     if (typeof setupAuth === 'function') setupAuth();
     initializeClock();
-    setupWindowControls();
     
-    // Module Init
-    if (typeof VFS !== 'undefined') VFS.init();
-    setupAppLaunchers();
-    
-    // Feature Init
-    if (typeof setupFinder === 'function') setupFinder();
-    if (typeof setupWallpaperEngine === 'function') setupWallpaperEngine();
-    if (typeof setupArcadeModules === 'function') setupArcadeModules();
-    if (typeof setupSnakeGame === 'function') setupSnakeGame();
-    if (typeof setupMinesweeper === 'function') setupMinesweeper();
-    if (typeof setupMemoryGame === 'function') setupMemoryGame();
-    if (typeof setupTerminalConsole === 'function') setupTerminalConsole();
-    if (typeof setupMissionControl === 'function') setupMissionControl();
-    if (typeof setupControlCenter === 'function') setupControlCenter();
-    if (typeof setupSettingsPanel === 'function') setupSettingsPanel();
-    if (typeof setupNotesApp === 'function') setupNotesApp();
-    if (typeof setupCalculator === 'function') setupCalculator();
-    if (typeof setupSpotlight === 'function') setupSpotlight();
-    
-    loadHardwareTelemetry();
-    
-    // Initialize starfield after everything else
-    createStarfield();
-    
-    // Log system startup
-    logSystemEvent('System initialized', 'startup');
-    
-    // Set up global error handler for debugging
-    window.onerror = function(message, source, lineno, colno, error) {
-        console.error('ZenithOS Error:', message, 'in', source, 'at line', lineno);
-        showGlobalAlert(`System Error: ${message}`);
-        logSystemEvent(`ERROR: ${message} at ${source}:${lineno}`, 'error');
-        return true; // Prevent default browser error handling
-    };
+    // Wait a bit for auth to complete, then init window manager
+    setTimeout(() => {
+        if (typeof setupWindowControls === 'function') setupWindowControls();
+        if (typeof setupAppLaunchers === 'function') setupAppLaunchers();
+        
+        // Module Init
+        if (typeof VFS !== 'undefined') VFS.init();
+        
+        // Feature Init - with delay to ensure VFS is ready
+        setTimeout(() => {
+            if (typeof setupFinder === 'function') setupFinder();
+            if (typeof setupWallpaperEngine === 'function') setupWallpaperEngine();
+            if (typeof setupArcadeModules === 'function') setupArcadeModules();
+            if (typeof setupSnakeGame === 'function') setupSnakeGame();
+            if (typeof setupMinesweeper === 'function') setupMinesweeper();
+            if (typeof setupMemoryGame === 'function') setupMemoryGame();
+            if (typeof setupTerminalConsole === 'function') setupTerminalConsole();
+            if (typeof setupMissionControl === 'function') setupMissionControl();
+            if (typeof setupControlCenter === 'function') setupControlCenter();
+            if (typeof setupSettingsPanel === 'function') setupSettingsPanel();
+            if (typeof setupNotesApp === 'function') setupNotesApp();
+            if (typeof setupCalculator === 'function') setupCalculator();
+            if (typeof setupSpotlight === 'function') setupSpotlight();
+            
+            loadHardwareTelemetry();
+            createStarfield();
+            
+            // Log successful initialization
+            logSystemEvent('All modules initialized successfully', 'startup');
+        }, 100);
+    }, 100);
+}
+
+// Use DOMContentLoaded with a small delay to ensure everything is ready
+document.addEventListener('DOMContentLoaded', () => {
+    // Small delay to ensure all scripts are loaded
+    setTimeout(initializeSystem, 50);
 });
 
 function initializeClock() {
