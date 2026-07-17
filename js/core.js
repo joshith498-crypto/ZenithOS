@@ -4,18 +4,15 @@
 // NOTE: This file orchestrates all the modules. The order of initialization matters!
 // I learned this the hard way when VFS wasn't loaded before Terminal tried to use it.
 //
-// Also, I spent like an hour debugging why the clock wasn't updating - turned out
-// I forgot to call setInterval. Classic me.
-//
-// FIX: Added setTimeout to ensure DOM is fully loaded before initializing modules
+// FIX: Using setTimeout to ensure DOM is fully parsed before initialization
 
 const SystemState = {
     userAccount: 'Astronaut Voyager',
     energyCrystals: parseInt(localStorage.getItem('qos_crystals')) || 0,
     currentPath: ['Desktop'],
-    bootTime: Date.now(), // Track when the system booted
-    activeWindows: new Set(), // Track open windows
-    logs: [] // System activity logs
+    bootTime: Date.now(),
+    activeWindows: new Set(),
+    logs: []
 };
 
 // Global uptime function for neofetch command
@@ -37,51 +34,34 @@ function showGlobalAlert(message, duration = 3000) {
     popup.style.display = 'block';
     popup.style.opacity = '1';
     
-    // Add to system logs
-    SystemState.logs.unshift({
-        timestamp: Date.now(),
-        message: message,
-        type: 'alert'
-    });
+    SystemState.logs.unshift({ timestamp: Date.now(), message: message, type: 'alert' });
     if (SystemState.logs.length > 50) SystemState.logs.pop();
     
     setTimeout(() => {
         popup.style.opacity = '0';
-        setTimeout(() => {
-            popup.style.display = 'none';
-        }, 300);
+        setTimeout(() => popup.style.display = 'none', 300);
     }, duration);
 }
 
 // System logging function
 function logSystemEvent(message, type = 'info') {
-    SystemState.logs.unshift({
-        timestamp: Date.now(),
-        message: message,
-        type: type
-    });
+    SystemState.logs.unshift({ timestamp: Date.now(), message: message, type: type });
     if (SystemState.logs.length > 50) SystemState.logs.pop();
     
-    // Save logs to localStorage
     try {
         localStorage.setItem('zenith_system_logs', JSON.stringify(SystemState.logs));
     } catch (e) {
         console.warn('Failed to save logs:', e);
     }
     
-    // Update Mission Control logs if visible
-    if (typeof renderSystemLogs === 'function') {
-        renderSystemLogs();
-    }
+    if (typeof renderSystemLogs === 'function') renderSystemLogs();
 }
 
 // Load saved logs on startup
 function loadSystemLogs() {
     try {
         const savedLogs = localStorage.getItem('zenith_system_logs');
-        if (savedLogs) {
-            SystemState.logs = JSON.parse(savedLogs);
-        }
+        if (savedLogs) SystemState.logs = JSON.parse(savedLogs);
     } catch (e) {
         console.warn('Failed to load logs:', e);
         SystemState.logs = [];
@@ -102,58 +82,54 @@ function unregisterWindow(windowId) {
 }
 
 function updateMissionControl() {
-    if (typeof updateActiveWindows === 'function') {
-        updateActiveWindows();
-    }
+    if (typeof updateActiveWindows === 'function') updateActiveWindows();
 }
 
-// Initialize the system with a delay to ensure DOM is ready
+// Initialize everything
 function initializeSystem() {
-    // Load system logs
     loadSystemLogs();
     
-    // Core Init
+    // Step 1: Auth
     if (typeof setupAuth === 'function') setupAuth();
+    
+    // Step 2: Clock
     initializeClock();
     
-    // Wait a bit for auth to complete, then init window manager
+    // Step 3: Window manager
+    if (typeof setupWindowControls === 'function') setupWindowControls();
+    if (typeof setupAppLaunchers === 'function') setupAppLaunchers();
+    
+    // Step 4: VFS
+    if (typeof VFS !== 'undefined') VFS.init();
+    
+    // Step 5: All features (with small delay to ensure DOM is ready)
     setTimeout(() => {
-        if (typeof setupWindowControls === 'function') setupWindowControls();
-        if (typeof setupAppLaunchers === 'function') setupAppLaunchers();
+        if (typeof setupFinder === 'function') setupFinder();
+        if (typeof setupWallpaperEngine === 'function') setupWallpaperEngine();
+        if (typeof setupArcadeModules === 'function') setupArcadeModules();
+        if (typeof setupSnakeGame === 'function') setupSnakeGame();
+        if (typeof setupMinesweeper === 'function') setupMinesweeper();
+        if (typeof setupMemoryGame === 'function') setupMemoryGame();
+        if (typeof setupTerminalConsole === 'function') setupTerminalConsole();
+        if (typeof setupMissionControl === 'function') setupMissionControl();
+        if (typeof setupControlCenter === 'function') setupControlCenter();
+        if (typeof setupSettingsPanel === 'function') setupSettingsPanel();
+        if (typeof setupNotesApp === 'function') setupNotesApp();
+        if (typeof setupCalculator === 'function') setupCalculator();
+        if (typeof setupSpotlight === 'function') setupSpotlight();
         
-        // Module Init
-        if (typeof VFS !== 'undefined') VFS.init();
-        
-        // Feature Init - with delay to ensure VFS is ready
-        setTimeout(() => {
-            if (typeof setupFinder === 'function') setupFinder();
-            if (typeof setupWallpaperEngine === 'function') setupWallpaperEngine();
-            if (typeof setupArcadeModules === 'function') setupArcadeModules();
-            if (typeof setupSnakeGame === 'function') setupSnakeGame();
-            if (typeof setupMinesweeper === 'function') setupMinesweeper();
-            if (typeof setupMemoryGame === 'function') setupMemoryGame();
-            if (typeof setupTerminalConsole === 'function') setupTerminalConsole();
-            if (typeof setupMissionControl === 'function') setupMissionControl();
-            if (typeof setupControlCenter === 'function') setupControlCenter();
-            if (typeof setupSettingsPanel === 'function') setupSettingsPanel();
-            if (typeof setupNotesApp === 'function') setupNotesApp();
-            if (typeof setupCalculator === 'function') setupCalculator();
-            if (typeof setupSpotlight === 'function') setupSpotlight();
-            
-            loadHardwareTelemetry();
-            createStarfield();
-            
-            // Log successful initialization
-            logSystemEvent('All modules initialized successfully', 'startup');
-        }, 100);
-    }, 100);
+        loadHardwareTelemetry();
+        createStarfield();
+        logSystemEvent('All modules initialized', 'startup');
+    }, 50);
 }
 
-// Use DOMContentLoaded with a small delay to ensure everything is ready
-document.addEventListener('DOMContentLoaded', () => {
-    // Small delay to ensure all scripts are loaded
-    setTimeout(initializeSystem, 50);
-});
+// Initialize when DOM is ready
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    setTimeout(initializeSystem, 0);
+} else {
+    document.addEventListener('DOMContentLoaded', initializeSystem);
+}
 
 function initializeClock() {
     const clockElement = document.getElementById('live-clock');
@@ -228,47 +204,31 @@ function createStarfield() {
     const field = document.getElementById("starfield");
     if (!field) return;
 
-    // Clear existing stars (in case of reload)
     field.innerHTML = '';
 
-    // Create 100 stars with random positions and animations
     for (let i = 0; i < 100; i++) {
         const star = document.createElement("div");
         star.className = "star";
-        
-        // Random position
         star.style.left = Math.random() * 100 + "%";
         star.style.top = Math.random() * 100 + "%";
-        
-        // Random animation delay (0-5 seconds)
         star.style.animationDelay = (Math.random() * 5) + "s";
-        
-        // Random size (1-3px)
         const size = Math.random() * 2 + 1;
         star.style.width = size + "px";
         star.style.height = size + "px";
-        
-        // Random opacity (0.3-1)
         star.style.opacity = Math.random() * 0.7 + 0.3;
-        
-        // Some stars twinkle faster
-        if (Math.random() > 0.7) {
-            star.style.animationDuration = "1s";
-        }
-        
-        // Some stars are colored (my personal touch)
+        if (Math.random() > 0.7) star.style.animationDuration = "1s";
         if (Math.random() > 0.9) {
             const colors = ['#b794f4', '#f687b3', '#00ff66', '#ffb347'];
             star.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
             star.style.borderRadius = '50%';
         }
-        
         field.appendChild(star);
     }
 }
 
-// Make createStarfield available globally
+// Make functions globally available
 window.createStarfield = createStarfield;
-
-// Make logSystemEvent globally accessible
 window.logSystemEvent = logSystemEvent;
+window.showGlobalAlert = showGlobalAlert;
+window.getUptime = getUptime;
+window.SystemState = SystemState;
