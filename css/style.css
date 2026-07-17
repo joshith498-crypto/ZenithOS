@@ -340,6 +340,17 @@ body {
 
 .file-item:hover { background: rgba(0, 255, 102, 0.08); color: var(--qos-accent); }
 .file-icon { font-size: 26px; }
+
+.file-item.selected { background: rgba(183, 148, 244, 0.15); border: 1px solid #b794f4; }
+.file-item.selected .file-label { color: #b794f4; }
+
+/* Finder Context Menus */
+.finder-context-menu { position: absolute; z-index: 10000; }
+.finder-menu-item { padding: 6px 12px; cursor: pointer; border-radius: 4px; font-size: 12px; }
+.finder-menu-item:hover { background: rgba(255, 255, 255, 0.08); }
+.finder-empty { text-align: center; padding: 40px; color: rgba(255,255,255,0.4); }
+.breadcrumb-item { cursor: pointer; color: #b794f4; margin-right: 4px; }
+.breadcrumb-sep { color: rgba(255,255,255,0.4); }
 .file-label { font-size: 11.5px; text-align: center; word-break: break-all; }
 
 /* --- MODULES: TERMINAL --- */
