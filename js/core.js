@@ -1,9 +1,60 @@
 // ZenithOS - Core System & State
+// Main initialization file
+// 
+// NOTE: This file orchestrates all the modules. The order of initialization matters!
+// I learned this the hard way when VFS wasn't loaded before Terminal tried to use it.
+
 const SystemState = {
     userAccount: 'Astronaut Voyager',
     energyCrystals: parseInt(localStorage.getItem('qos_crystals')) || 0,
-    currentPath: ['Desktop']
+    currentPath: ['Desktop'],
+    bootTime: Date.now(), // Track when the system booted
+    activeWindows: new Set() // Track open windows
 };
+
+// Global uptime function for neofetch command
+function getUptime() {
+    const seconds = Math.floor((Date.now() - SystemState.bootTime) / 1000);
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    return `${hours}h ${minutes}m ${secs}s`;
+}
+
+// Global alert system
+function showGlobalAlert(message, duration = 3000) {
+    const popup = document.getElementById('system-popup');
+    const popupText = document.getElementById('popup-text');
+    if (!popup || !popupText) return;
+    
+    popupText.textContent = message;
+    popup.style.display = 'block';
+    popup.style.opacity = '1';
+    
+    setTimeout(() => {
+        popup.style.opacity = '0';
+        setTimeout(() => {
+            popup.style.display = 'none';
+        }, 300);
+    }, duration);
+}
+
+// Track active windows
+function registerWindow(windowId) {
+    SystemState.activeWindows.add(windowId);
+    updateMissionControl();
+}
+
+function unregisterWindow(windowId) {
+    SystemState.activeWindows.delete(windowId);
+    updateMissionControl();
+}
+
+function updateMissionControl() {
+    if (typeof updateActiveWindows === 'function') {
+        updateActiveWindows();
+    }
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     // Core Init
@@ -31,6 +82,16 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof setupSpotlight === 'function') setupSpotlight();
     
     loadHardwareTelemetry();
+    
+    // Initialize starfield after everything else
+    createStarfield();
+    
+    // Set up global error handler for debugging
+    window.onerror = function(message, source, lineno, colno, error) {
+        console.error('ZenithOS Error:', message, 'in', source, 'at line', lineno);
+        showGlobalAlert(`System Error: ${message}`);
+        return true; // Prevent default browser error handling
+    };
 });
 
 function initializeClock() {
@@ -69,6 +130,8 @@ function runBootSequence() {
         'CALIBRATING TELEMETRY ARRAY...',
         'LINKING DEEP SPACE NETWORK...',
         'LOADING DOCK INTERFACE...',
+        'STARTING WINDOW MANAGER...',
+        'INITIALIZING STARFIELD RENDERER...',
         'ALL SYSTEMS NOMINAL.'
     ];
 
@@ -96,28 +159,43 @@ function runBootSequence() {
     };
     step();
 }
-function createStarfield(){
 
-    const field=document.getElementById("starfield");
+// Starfield background
+function createStarfield() {
+    const field = document.getElementById("starfield");
+    if (!field) return;
 
-    if(!field) return;
+    // Clear existing stars (in case of reload)
+    field.innerHTML = '';
 
-    for(let i=0;i<80;i++){
-
-        const star=document.createElement("div");
-
-        star.className="star";
-
-        star.style.left=Math.random()*100+"%";
-
-        star.style.top=Math.random()*100+"%";
-
-        star.style.animationDelay=(Math.random()*5)+"s";
-
+    // Create 100 stars with random positions and animations
+    for (let i = 0; i < 100; i++) {
+        const star = document.createElement("div");
+        star.className = "star";
+        
+        // Random position
+        star.style.left = Math.random() * 100 + "%";
+        star.style.top = Math.random() * 100 + "%";
+        
+        // Random animation delay (0-5 seconds)
+        star.style.animationDelay = (Math.random() * 5) + "s";
+        
+        // Random size (1-3px)
+        const size = Math.random() * 2 + 1;
+        star.style.width = size + "px";
+        star.style.height = size + "px";
+        
+        // Random opacity (0.3-1)
+        star.style.opacity = Math.random() * 0.7 + 0.3;
+        
+        // Some stars twinkle faster
+        if (Math.random() > 0.7) {
+            star.style.animationDuration = "1s";
+        }
+        
         field.appendChild(star);
-
     }
-
 }
 
-createStarfield();
+// Make createStarfield available globally
+window.createStarfield = createStarfield;

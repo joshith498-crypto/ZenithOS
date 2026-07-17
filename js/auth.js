@@ -1,5 +1,44 @@
 // ZenithOS - Authentication & User Session
+// Also handles developer mode activation (Konami code)
+
 const AUTH_KEY = 'qos_account_v1';
+const DEV_MODE_KEY = 'zenith_dev_mode';
+
+// Developer mode state
+let devModeActive = localStorage.getItem(DEV_MODE_KEY) === 'true';
+
+// Konami code sequence
+const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
+let konamiIndex = 0;
+
+// Listen for Konami code globally
+document.addEventListener('keydown', (e) => {
+    if (e.key === konamiCode[konamiIndex]) {
+        konamiIndex++;
+        if (konamiIndex === konamiCode.length) {
+            activateDevMode();
+            konamiIndex = 0;
+        }
+    } else {
+        konamiIndex = 0;
+    }
+});
+
+function activateDevMode() {
+    devModeActive = true;
+    localStorage.setItem(DEV_MODE_KEY, 'true');
+    showGlobalAlert('DEVELOPER MODE ACTIVATED! Hidden features unlocked.');
+    console.log('%c🚀 DEVELOPER MODE ACTIVATED', 'color: #b794f4; font-size: 20px; font-weight: bold;');
+    console.log('%cTry these secret commands in Terminal:', 'color: #f687b3;');
+    console.log('%c- easteregg', 'color: #b794f4;');
+    console.log('%c- neofetch', 'color: #b794f4;');
+    console.log('%c- top', 'color: #b794f4;');
+    console.log('%c- fortune', 'color: #b794f4;');
+}
+
+function isDevMode() {
+    return devModeActive;
+}
 
 function getAccount() {
     const raw = localStorage.getItem(AUTH_KEY);
@@ -18,7 +57,7 @@ function setupAuth() {
     if (account) {
         signupCard.style.display = 'none';
         signinCard.style.display = 'flex';
-        document.getElementById('signin-avatar').textContent = account.avatar || '🧑‍🚀';
+        document.getElementById('signin-avatar').textContent = account.avatar || 'F469F680';
         document.getElementById('signin-name').textContent = `Welcome back, ${account.displayName}`;
         document.getElementById('signin-username').value = account.username;
     } else {
@@ -27,7 +66,7 @@ function setupAuth() {
     }
 
     // Signup avatar picker
-    let selectedAvatar = '🧑‍🚀';
+    let selectedAvatar = 'F469F680';
     document.querySelectorAll('#signup-avatar-picker .avatar-option').forEach(btn => {
         btn.onclick = () => {
             document.querySelectorAll('#signup-avatar-picker .avatar-option').forEach(b => b.classList.remove('selected'));
@@ -80,6 +119,7 @@ function setupAuth() {
     const logoutBtn = document.getElementById('cc-logout');
     if (logoutBtn) {
         logoutBtn.onclick = () => {
+            localStorage.removeItem(AUTH_KEY);
             location.reload();
         };
     }

@@ -1,4 +1,5 @@
 // ZenithOS - System Settings & Customization
+// Added custom wallpaper upload feature
 
 function setupSettingsPanel() {
     const brightnessSlider = document.getElementById('set-brightness');
@@ -87,6 +88,23 @@ function setupSettingsPanel() {
     });
     const savedAccent = localStorage.getItem('qos_accent');
     if (savedAccent) document.documentElement.style.setProperty('--qos-accent', savedAccent);
+
+    // Developer mode toggle (hidden by default)
+    if (isDevMode()) {
+        const devModeToggle = document.createElement('div');
+        devModeToggle.style.marginTop = '16px';
+        devModeToggle.style.padding = '8px';
+        devModeToggle.style.background = 'rgba(183, 148, 244, 0.1)';
+        devModeToggle.style.border = '1px solid #b794f4';
+        devModeToggle.style.borderRadius = '6px';
+        devModeToggle.style.fontSize = '12px';
+        devModeToggle.textContent = '⚡ Developer Mode: ACTIVE';
+        
+        const wallpaperTab = document.getElementById('tab-wallpaper');
+        if (wallpaperTab) {
+            wallpaperTab.appendChild(devModeToggle);
+        }
+    }
 }
 
 function applyGlassBlur(px) {
@@ -115,7 +133,15 @@ function setupWallpaperEngine() {
 
     const saved = localStorage.getItem('qos_wallpaper');
     if (saved) {
-        bg.className = 'desktop-workspace bg-' + saved;
+        // Check if it's a custom wallpaper
+        if (saved.startsWith('data:')) {
+            bg.style.backgroundImage = `url(${saved})`;
+            bg.style.backgroundSize = 'cover';
+            bg.style.backgroundPosition = 'center';
+            bg.style.backgroundRepeat = 'no-repeat';
+        } else {
+            bg.className = 'desktop-workspace bg-' + saved;
+        }
     }
 
     buttons.forEach(btn => {
@@ -127,4 +153,102 @@ function setupWallpaperEngine() {
             showGlobalAlert(`Wallpaper updated to: [${variant.toUpperCase()}]`);
         });
     });
+
+    // Add custom wallpaper upload feature
+    const wallpaperTab = document.getElementById('tab-wallpaper');
+    if (wallpaperTab && isDevMode()) {
+        const uploadContainer = document.createElement('div');
+        uploadContainer.style.marginTop = '16px';
+        uploadContainer.style.padding = '12px';
+        uploadContainer.style.background = 'rgba(0, 0, 0, 0.3)';
+        uploadContainer.style.borderRadius = '8px';
+        uploadContainer.style.border = '1px dashed rgba(255, 255, 255, 0.2)';
+        
+        const uploadTitle = document.createElement('div');
+        uploadTitle.style.fontSize = '13px';
+        uploadTitle.style.marginBottom = '8px';
+        uploadTitle.style.color = '#b794f4';
+        uploadTitle.textContent = 'Upload Custom Wallpaper (Dev Mode)';
+        
+        const uploadInput = document.createElement('input');
+        uploadInput.type = 'file';
+        uploadInput.accept = 'image/*';
+        uploadInput.style.display = 'none';
+        uploadInput.id = 'custom-wallpaper-upload';
+        
+        const uploadButton = document.createElement('button');
+        uploadButton.textContent = '📁 Choose Image';
+        uploadButton.style.padding = '6px 12px';
+        uploadButton.style.background = 'rgba(183, 148, 244, 0.2)';
+        uploadButton.style.border = '1px solid #b794f4';
+        uploadButton.style.borderRadius = '4px';
+        uploadButton.style.color = '#b794f4';
+        uploadButton.style.cursor = 'pointer';
+        uploadButton.style.fontSize = '12px';
+        uploadButton.onclick = () => uploadInput.click();
+        
+        const uploadStatus = document.createElement('div');
+        uploadStatus.style.marginTop = '8px';
+        uploadStatus.style.fontSize = '11px';
+        uploadStatus.style.color = 'rgba(255, 255, 255, 0.6)';
+        uploadStatus.textContent = 'Max size: 2MB';
+        
+        uploadContainer.appendChild(uploadTitle);
+        uploadContainer.appendChild(uploadButton);
+        uploadContainer.appendChild(uploadInput);
+        uploadContainer.appendChild(uploadStatus);
+        
+        wallpaperTab.appendChild(uploadContainer);
+        
+        // Handle file upload
+        uploadInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            // Check file size (max 2MB)
+            if (file.size > 2 * 1024 * 1024) {
+                uploadStatus.textContent = 'Error: File too large (max 2MB)';
+                uploadStatus.style.color = '#ff5f56';
+                return;
+            }
+            
+            // Check if image
+            if (!file.type.startsWith('image/')) {
+                uploadStatus.textContent = 'Error: Please select an image file';
+                uploadStatus.style.color = '#ff5f56';
+                return;
+            }
+            
+            uploadStatus.textContent = 'Loading...';
+            uploadStatus.style.color = '#f687b3';
+            
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const imageData = event.target.result;
+                
+                // Apply the new wallpaper
+                bg.style.backgroundImage = `url(${imageData})`;
+                bg.style.backgroundSize = 'cover';
+                bg.style.backgroundPosition = 'center';
+                bg.style.backgroundRepeat = 'no-repeat';
+                bg.className = 'desktop-workspace';
+                
+                // Save to localStorage
+                localStorage.setItem('qos_wallpaper', imageData);
+                
+                uploadStatus.textContent = 'Wallpaper set! Refresh to see changes.';
+                uploadStatus.style.color = '#4ade80';
+                showGlobalAlert('Custom wallpaper applied!');
+                
+                // Reset input so same file can be selected again
+                uploadInput.value = '';
+            };
+            reader.onerror = () => {
+                uploadStatus.textContent = 'Error: Failed to read file';
+                uploadStatus.style.color = '#ff5f56';
+            };
+            
+            reader.readAsDataURL(file);
+        });
+    }
 }
